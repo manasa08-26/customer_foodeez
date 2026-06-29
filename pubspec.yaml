@@ -1,0 +1,43 @@
+name: foodeez_customer
+description: Foodeez Customer — food delivery mobile app.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  go_router: ^17.3.0
+  flutter_riverpod: ^3.3.2
+  http: ^1.2.2
+
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^10.3.1
+
+  google_fonts: ^8.1.0
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  badges: ^3.1.2
+
+  intl: ^0.20.0
+  timeago: ^3.6.1
+  geolocator: ^13.0.2
+  connectivity_plus: ^7.1.1
+  pull_to_refresh_flutter3: ^2.0.1
+  video_player: ^2.9.2
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
