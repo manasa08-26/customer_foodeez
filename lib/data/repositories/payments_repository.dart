@@ -51,9 +51,11 @@ class PaymentsRepository {
   List<dynamic> _extractList(dynamic res) {
     if (res is List) return res;
     final map = JsonParsers.mapValue(res);
-    final data = JsonParsers.mapValue(map['data']);
-    if (data['transactions'] is List) return data['transactions'] as List;
-    if (data['items'] is List) return data['items'] as List;
+    final data = map['data'];
+    if (data is List) return data;
+    final dataMap = JsonParsers.mapValue(data);
+    if (dataMap['transactions'] is List) return dataMap['transactions'] as List;
+    if (dataMap['items'] is List) return dataMap['items'] as List;
     if (map['transactions'] is List) return map['transactions'] as List;
     return [];
   }

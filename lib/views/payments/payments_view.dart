@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/network/api_exception.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../core/constants/app_colors.dart';
@@ -61,7 +62,9 @@ class _PaymentsViewState extends ConsumerState<PaymentsView> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _topupMsg = e is Exception ? e.toString() : 'Top-up failed.';
+          _topupMsg = e is ApiException
+              ? e.message
+              : 'Top-up failed. Please try again.';
         });
       }
     } finally {
@@ -108,10 +111,7 @@ class _PaymentsViewState extends ConsumerState<PaymentsView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Wallet',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+          
             const SizedBox(height: AppDimensions.spacingXxs),
             Text(
               'Your FooDeeZ balance & transactions',
@@ -214,7 +214,7 @@ class _PaymentsViewState extends ConsumerState<PaymentsView> {
     for (final tx in transactions) {
       final date = tx.createdAt?.toLocal();
       final key = date != null
-          ? DateFormat('d MMM y', 'en_IN').format(date)
+          ? DateFormat('d MMM y').format(date)
           : 'Unknown date';
       grouped.putIfAbsent(key, () => []).add(tx);
     }
@@ -233,8 +233,7 @@ class _BalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final monthYear =
-        DateFormat('MMM y', 'en_IN').format(DateTime.now());
+    final monthYear = DateFormat('MMM y').format(DateTime.now());
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacingXl),
@@ -471,33 +470,45 @@ class _TopupPanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppDimensions.spacingMd),
-          Row(
-            children: quickAmounts
-                .map(
-                  (amt) => Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        right: amt == quickAmounts.last ? 0 : 8,
-                      ),
-                      child: OutlinedButton(
-                        onPressed: () => onQuickAmount(amt),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: amountCtrl.text == '$amt'
-                              ? AppColors.customerAccentSurface
-                              : null,
-                          side: BorderSide(
-                            color: amountCtrl.text == '$amt'
-                                ? AppColors.customerAccent
-                                : Theme.of(context).dividerColor,
-                          ),
-                        ),
-                        child: Text('₹$amt'),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
+         Row(
+  children: quickAmounts.map((amt) {
+    final isSelected = amountCtrl.text == '$amt';
+
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(
+          right: amt == quickAmounts.last ? 0 : 8,
+        ),
+        child: OutlinedButton(
+          onPressed: () => onQuickAmount(amt),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48), // Same height
+            // or fixedSize: const Size(double.infinity, 48),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            backgroundColor: isSelected
+                ? AppColors.customerAccentSurface
+                : null,
+            side: BorderSide(
+              color: isSelected
+                  ? AppColors.customerAccent
+                  : Theme.of(context).dividerColor,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              '₹$amt',
+              maxLines: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+  }).toList(),
+),
           const SizedBox(height: AppDimensions.spacingMd),
           Text(
             'CUSTOM AMOUNT (₹)',
@@ -697,6 +708,10 @@ class _TransactionRow extends StatelessWidget {
 
   static const _cfg = {
     'CREDIT': (icon: '↓', color: Color(0xFF4ADE80), sign: '+'),
+    'TOPUP': (icon: '↓', color: Color(0xFF4ADE80), sign: '+'),
+    'REFUND_CREDIT': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
+    'CASHBACK_CREDIT': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
+    'REFERRAL_CREDIT': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
     'DEBIT': (icon: '↑', color: Color(0xFFF87171), sign: '−'),
     'REFUND': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
   };
@@ -706,7 +721,7 @@ class _TransactionRow extends StatelessWidget {
     final cfg = _cfg[tx.type] ??
         (icon: '·', color: Theme.of(context).colorScheme.onSurface, sign: '');
     final time = tx.createdAt != null
-        ? DateFormat('hh:mm a', 'en_IN').format(tx.createdAt!.toLocal())
+        ? DateFormat('hh:mm a').format(tx.createdAt!.toLocal())
         : '';
 
     return Column(

@@ -42,7 +42,8 @@ class WalletState {
       .fold(0, (sum, t) => sum + t.amount);
 
   double get totalCashback => transactions
-      .where((t) => t.type == 'REFUND')
+      .where((t) =>
+          t.type.contains('REFUND') || t.type.contains('CASHBACK'))
       .fold(0, (sum, t) => sum + t.amount);
 }
 
@@ -101,9 +102,8 @@ class WalletController extends AsyncNotifier<WalletState> {
           isLoadingMore: false,
         ),
       );
-    } catch (e, st) {
+    } catch (_) {
       state = AsyncValue.data(current.copyWith(isLoadingMore: false));
-      state = AsyncValue.error(e, st);
     }
   }
 }

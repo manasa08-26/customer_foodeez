@@ -47,8 +47,8 @@ class RestaurantMenuState {
       cats = cats
           .map((c) {
             final items = c.items.where((i) {
-              if (vegFilter == VegFilter.veg) return i.isVeg == true;
-              return i.isVeg == false;
+              if (vegFilter == VegFilter.veg) return i.resolvedIsVeg == true;
+              return i.resolvedIsVeg == false;
             }).toList();
             return MenuCategoryModel(
               id: c.id,
@@ -105,10 +105,12 @@ class RestaurantController extends Notifier<RestaurantMenuState> {
         repo.getMenu(_branchId),
       ]);
       final restaurant = results[0] as RestaurantDetailModel;
-      state = RestaurantMenuState(
+      final categories = results[1] as List<MenuCategoryModel>;
+      state = state.copyWith(
         restaurant: restaurant,
-        categories: results[1] as List<MenuCategoryModel>,
+        categories: categories,
         isLoading: false,
+        clearError: true,
       );
       await CartRestaurantCache.save(
         name: restaurant.name,

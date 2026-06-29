@@ -38,7 +38,7 @@ class MenuItemCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      VegDot(isVeg: item.isVeg),
+                      VegDot(isVeg: item.resolvedIsVeg),
                       const SizedBox(width: AppDimensions.spacingXs),
                       Expanded(
                         child: Text(

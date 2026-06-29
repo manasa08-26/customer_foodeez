@@ -49,7 +49,7 @@ class WalletTransactionModel {
       type: JsonParsers.stringValue(json['type'] ?? json['transactionType']),
       description: json['description']?.toString(),
       createdAt: DateTime.tryParse(
-        JsonParsers.stringValue(json['createdAt']),
+        JsonParsers.stringValue(json['createdAt'] ?? json['created_at']),
       ),
       status: json['status']?.toString(),
     );

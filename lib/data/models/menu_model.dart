@@ -42,14 +42,55 @@ class MenuItemModel {
   final String? imageUrl;
   final List<MenuAddonModel> addons;
 
+  /// Parses veg flag from API — supports camelCase, snake_case, and foodType.
+  static bool? parseIsVeg(Map<String, dynamic> json) {
+    final direct = JsonParsers.boolValue(
+      json['isVeg'] ?? json['is_veg'] ?? json['veg'],
+    );
+    if (direct != null) return direct;
+
+    final foodType =
+        json['foodType'] ?? json['food_type'] ?? json['itemType'] ?? json['type'];
+    if (foodType != null) {
+      final normalized = foodType.toString().trim().toUpperCase();
+      if (normalized.contains('NON')) return false;
+      if (normalized.contains('VEG')) return true;
+    }
+    return null;
+  }
+
+  /// Veg flag from API, or inferred from item name when the API omits it.
+  bool? get resolvedIsVeg => isVeg ?? inferVegFromName(name);
+
+  static bool? inferVegFromName(String name) {
+    final n = name.toLowerCase();
+    const nonVegTerms = [
+      'chicken', 'mutton', 'lamb', 'prawn', 'prawns', 'fish', 'egg', 'eggs',
+      'meat', 'keema', 'kheema', 'beef', 'pork', 'crab', 'seafood', 'goat',
+      'liver', 'gizzard', 'nalli', 'boneless fry', 'duck', 'turkey', 'ham',
+    ];
+    for (final term in nonVegTerms) {
+      if (n.contains(term)) return false;
+    }
+    const vegTerms = [
+      'paneer', 'veg ', 'veg-', 'vegetable', 'aloo', 'gobi', 'mushroom',
+      'dal', 'chana', 'palak', 'corn', 'capsicum', 'tomato', 'manchuria',
+      'fry piece', 'samosa', 'dosa', 'idli', 'vada', 'poori', 'roti',
+    ];
+    for (final term in vegTerms) {
+      if (n.contains(term)) return true;
+    }
+    return null;
+  }
+
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
     return MenuItemModel(
       id: JsonParsers.stringValue(json['id']),
       name: JsonParsers.stringValue(json['name']),
       price: JsonParsers.doubleOrZero(json['price']),
       description: json['description']?.toString(),
-      isVeg: JsonParsers.boolValue(json['isVeg']),
-      imageUrl: json['imageUrl']?.toString(),
+      isVeg: MenuItemModel.parseIsVeg(json),
+      imageUrl: (json['imageUrl'] ?? json['image_url'])?.toString(),
       addons: JsonParsers.listValue(json['addons'])
           .whereType<Map>()
           .map((e) => MenuAddonModel.fromJson(Map<String, dynamic>.from(e)))
@@ -78,7 +119,7 @@ class MenuCategoryModel {
       displayName: JsonParsers.stringValue(
         json['displayName'] ?? json['name'],
       ),
-      items: JsonParsers.listValue(json['items'])
+      items: JsonParsers.listValue(json['items'] ?? json['menuItems'])
           .whereType<Map>()
           .map((e) => MenuItemModel.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
