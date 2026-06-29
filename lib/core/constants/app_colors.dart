@@ -14,6 +14,11 @@ class AppColors {
   static const Color accent = Color(0xFFB083F0);
   static const Color accentLight = Color(0xFFE9D8FD);
 
+  /// Customer web parity — cart / wallet CTAs (foodeez_frontend-dev).
+  static const Color customerAccent = Color(0xFFB88A2E);
+  static const Color customerAccentSurface = Color(0xFFFEF5E6);
+  static const Color customerAccentBorder = Color(0xFFF7D19A);
+
   // Neutrals
   static const Color white = Color(0xFFFFFFFF);
   static const Color background = Color(0xFFFAF8FD);

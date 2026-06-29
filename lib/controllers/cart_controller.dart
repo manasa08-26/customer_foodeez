@@ -9,13 +9,13 @@ import 'auth_controller.dart';
 class CartController extends Notifier<AsyncValue<CartModel>> {
   @override
   AsyncValue<CartModel> build() {
-    return const AsyncValue.data(CartModel.empty);
+    return AsyncValue.data(CartModel.empty);
   }
 
   Future<void> fetchCart() async {
     final authed = ref.read(authControllerProvider).value ?? false;
     if (!authed) {
-      state = const AsyncValue.data(CartModel.empty);
+      state = AsyncValue.data(CartModel.empty);
       return;
     }
     state = const AsyncValue.loading();
@@ -88,7 +88,9 @@ class CartController extends Notifier<AsyncValue<CartModel>> {
 
   Future<void> applyCoupon(String code) async {
     try {
-      final cart = await ref.read(cartRepositoryProvider).applyCoupon(code);
+      final cart = await ref
+          .read(cartRepositoryProvider)
+          .applyCoupon(code.trim().toUpperCase());
       state = AsyncValue.data(cart);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -104,6 +106,11 @@ class CartController extends Notifier<AsyncValue<CartModel>> {
       state = AsyncValue.error(e, st);
       rethrow;
     }
+  }
+
+  /// Clears local cart badge after successful checkout (web `setCartCount(0)`).
+  void clearLocalCart() {
+    state = AsyncValue.data(CartModel.empty);
   }
 
   int get badgeCount => state.value?.itemCount ?? 0;

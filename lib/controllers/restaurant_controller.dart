@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/storage/cart_restaurant_cache.dart';
 import '../core/utils/error_messages.dart';
 import '../data/models/menu_model.dart';
 import '../data/repositories/discovery_repository.dart';
@@ -103,10 +104,15 @@ class RestaurantController extends Notifier<RestaurantMenuState> {
         repo.getRestaurantDetails(_branchId),
         repo.getMenu(_branchId),
       ]);
+      final restaurant = results[0] as RestaurantDetailModel;
       state = RestaurantMenuState(
-        restaurant: results[0] as RestaurantDetailModel,
+        restaurant: restaurant,
         categories: results[1] as List<MenuCategoryModel>,
         isLoading: false,
+      );
+      await CartRestaurantCache.save(
+        name: restaurant.name,
+        location: restaurant.displayLocation,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: ErrorMessages.userFriendly(e));

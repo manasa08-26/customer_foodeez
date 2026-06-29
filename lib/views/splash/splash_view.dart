@@ -1,8 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math' as math;
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/discovery_controller.dart';
@@ -10,9 +12,8 @@ import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../router/route_paths.dart';
-import '../../widgets/common/customer_logo.dart';
 
-/// Branded splash — purple gradient, centered logo, reference-style layout.
+/// Full-screen branded splash — purple gradient + customer logo in white square.
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
@@ -81,107 +82,130 @@ class _SplashViewState extends ConsumerState<SplashView>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final basePurple = isDark ? AppColors.primaryDark : AppColors.primary;
-    final logoAsset =
-        isDark ? AppAssets.customerDark : AppAssets.customerLight;
+    final size = MediaQuery.sizeOf(context);
+    final logoBox = math.min(size.shortestSide * 0.34, 132.0);
 
-    return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: const Alignment(0, -0.15),
-            radius: 1.1,
-            colors: isDark
-                ? [
-                    const Color(0xFF4A2F8C),
-                    AppColors.primaryDark,
-                    const Color(0xFF1A1030),
-                  ]
-                : [
-                    AppColors.primaryLight,
-                    basePurple,
-                    AppColors.primaryDark,
-                  ],
-          ),
-        ),
-        child: SafeArea(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              AnimatedBuilder(
-                animation: _ringCtrl,
-                builder: (_, __) => CustomPaint(
-                  size: const Size(260, 260),
-                  painter: _RingPainter(
-                    progress: _ringCtrl.value,
-                    color: Colors.white.withValues(alpha: 0.14),
-                  ),
-                ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        body: SizedBox.expand(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        const Color(0xFF4A2F8C),
+                        AppColors.primaryDark,
+                        const Color(0xFF120A22),
+                      ]
+                    : [
+                        AppColors.primaryLight,
+                        AppColors.primary,
+                        AppColors.primaryDark,
+                      ],
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: ScaleTransition(
-                      scale: _logoScale,
-                      child: Container(
-                        width: CustomerLogoSizes.splashIconBox,
-                        height: CustomerLogoSizes.splashIconBox,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(22),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.18),
-                              blurRadius: 28,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: CustomerLogo.splashIcon(asset: logoAsset),
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              alignment: Alignment.center,
+              children: [
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: const Alignment(0, -0.2),
+                        radius: 1.15,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.08),
+                          Colors.transparent,
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: AppDimensions.spacingXl),
-                  FadeTransition(
-                    opacity: _textFade,
-                    child: Column(
-                      children: [
-                        Text(
-                          'Foodeez',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 34,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.spacingSm),
-                        Text(
-                          'Crave it. Tap it. Done.',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.82),
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.spacingXl),
-                        SizedBox(
-                          width: 26,
-                          height: 26,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Colors.white.withValues(alpha: 0.9),
-                          ),
-                        ),
-                      ],
+                ),
+                AnimatedBuilder(
+                  animation: _ringCtrl,
+                  builder: (_, __) => CustomPaint(
+                    size: Size(size.width, size.height),
+                    painter: _RingPainter(
+                      progress: _ringCtrl.value,
+                      color: Colors.white.withValues(alpha: 0.12),
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FadeTransition(
+                        opacity: _logoFade,
+                        child: ScaleTransition(
+                          scale: _logoScale,
+                          child: Container(
+                            width: logoBox,
+                            height: logoBox,
+                            padding: EdgeInsets.all(logoBox * 0.14),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(logoBox * 0.2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 32,
+                                  offset: const Offset(0, 12),
+                                ),
+                              ],
+                            ),
+                            child: Image.asset(
+                              AppAssets.customerLight,
+                              fit: BoxFit.contain,
+                              alignment: Alignment.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.spacingXl),
+                      FadeTransition(
+                        opacity: _textFade,
+                        child: Column(
+                          children: [
+                            Text(
+                              'Foodeez',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 34,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimensions.spacingSm),
+                            Text(
+                              'Crave it. Tap it. Done.',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withValues(alpha: 0.82),
+                              ),
+                            ),
+                            const SizedBox(height: AppDimensions.spacingXl),
+                            SizedBox(
+                              width: 26,
+                              height: 26,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white.withValues(alpha: 0.9),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -198,28 +222,30 @@ class _RingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
+    final baseRadius = size.shortestSide * 0.22;
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..color = color;
 
     for (var i = 0; i < 3; i++) {
-      final radius = 72.0 + i * 28 + progress * 6;
+      final radius = baseRadius + i * 28 + progress * 6;
       paint.strokeWidth = 1.2 - i * 0.2;
       canvas.drawCircle(center, radius, paint);
     }
 
     final dotPaint = Paint()..color = Colors.white.withValues(alpha: 0.55);
     final angle = progress * math.pi * 2;
+    final orbit = baseRadius + 20;
     canvas.drawCircle(
-      center + Offset(92 * math.cos(angle), 92 * math.sin(angle)),
+      center + Offset(orbit * math.cos(angle), orbit * math.sin(angle)),
       3,
       dotPaint,
     );
     canvas.drawCircle(
       center +
           Offset(
-            118 * math.cos(angle + 1.2),
-            118 * math.sin(angle + 1.2),
+            (orbit + 26) * math.cos(angle + 1.2),
+            (orbit + 26) * math.sin(angle + 1.2),
           ),
       2.5,
       dotPaint,

@@ -14,11 +14,13 @@ class WalletModel {
     final data = JsonParsers.mapValue(map['data']).isNotEmpty
         ? JsonParsers.mapValue(map['data'])
         : map;
+    final wallet = JsonParsers.mapValue(data['wallet']);
+    final source = wallet.isNotEmpty ? wallet : data;
     return WalletModel(
       balance: JsonParsers.doubleOrZero(
-        data['balance'] ?? data['walletBalance'],
+        source['balance'] ?? source['walletBalance'],
       ),
-      currency: JsonParsers.stringValue(data['currency'], 'INR'),
+      currency: JsonParsers.stringValue(source['currency'], 'INR'),
     );
   }
 }
@@ -30,6 +32,7 @@ class WalletTransactionModel {
     required this.type,
     this.description,
     this.createdAt,
+    this.status,
   });
 
   final String id;
@@ -37,6 +40,7 @@ class WalletTransactionModel {
   final String type;
   final String? description;
   final DateTime? createdAt;
+  final String? status;
 
   factory WalletTransactionModel.fromJson(Map<String, dynamic> json) {
     return WalletTransactionModel(
@@ -47,6 +51,7 @@ class WalletTransactionModel {
       createdAt: DateTime.tryParse(
         JsonParsers.stringValue(json['createdAt']),
       ),
+      status: json['status']?.toString(),
     );
   }
 }

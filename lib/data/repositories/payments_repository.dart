@@ -34,15 +34,18 @@ class PaymentsRepository {
         .toList();
   }
 
-  Future<void> topUpInitiate({
+  Future<Map<String, dynamic>> topUpInitiate({
     required double amount,
     String gateway = 'razorpay',
   }) async {
-    await _api.post(
+    final res = await _api.post(
       ApiEndpoints.walletTopupInitiate,
       authenticated: true,
       body: {'amount': amount, 'gateway': gateway},
     );
+    final map = JsonParsers.mapValue(res);
+    final data = JsonParsers.mapValue(map['data']);
+    return data.isNotEmpty ? data : map;
   }
 
   List<dynamic> _extractList(dynamic res) {

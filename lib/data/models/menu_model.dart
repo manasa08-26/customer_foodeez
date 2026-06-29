@@ -94,6 +94,8 @@ class RestaurantDetailModel {
     this.deliveryTime,
     this.deliveryFee,
     this.imageUrl,
+    this.location,
+    this.city,
   });
 
   final String name;
@@ -102,6 +104,10 @@ class RestaurantDetailModel {
   final int? deliveryTime;
   final double? deliveryFee;
   final String? imageUrl;
+  final String? location;
+  final String? city;
+
+  String get displayLocation => location ?? city ?? '';
 
   factory RestaurantDetailModel.fromJson(Map<String, dynamic> json) {
     final data = JsonParsers.mapValue(json['data']).isNotEmpty
@@ -114,6 +120,8 @@ class RestaurantDetailModel {
       deliveryTime: JsonParsers.intValue(data['deliveryTime']),
       deliveryFee: JsonParsers.doubleValue(data['deliveryFee']),
       imageUrl: data['imageUrl']?.toString(),
+      location: data['location']?.toString(),
+      city: data['city']?.toString(),
     );
   }
 }
