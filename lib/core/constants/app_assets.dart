@@ -17,4 +17,7 @@ class AppAssets {
   // Discovery / marketing (non-logo)
   static const String heroVideo = 'assets/images/herosection.mp4';
   static const String biryani = 'assets/images/biriyanipng.png';
+
+  // Social / auth
+  static const String googleIcon = 'assets/icons/google.png';
 }

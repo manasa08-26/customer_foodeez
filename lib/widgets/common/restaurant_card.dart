@@ -34,7 +34,6 @@ class RestaurantCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 3,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -110,29 +109,35 @@ class RestaurantCard extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(AppDimensions.spacingSm),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppDimensions.spacingSm,
+                AppDimensions.spacingXs,
+                AppDimensions.spacingSm,
+                AppDimensions.spacingSm,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    restaurant.name,
+                    style: Theme.of(context).textTheme.titleSmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (restaurant.cuisine != null) ...[
+                    const SizedBox(height: 2),
                     Text(
-                      restaurant.name,
-                      style: Theme.of(context).textTheme.titleSmall,
+                      restaurant.cuisine!,
+                      style: Theme.of(context).textTheme.bodySmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (restaurant.cuisine != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        restaurant.cuisine!,
-                        style: Theme.of(context).textTheme.bodySmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                    const Spacer(),
+                  ],
+                  if (restaurant.deliveryTime != null ||
+                      restaurant.deliveryFee != null) ...[
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         if (restaurant.deliveryTime != null)
@@ -158,7 +163,7 @@ class RestaurantCard extends StatelessWidget {
                       ],
                     ),
                   ],
-                ),
+                ],
               ),
             ),
           ],
