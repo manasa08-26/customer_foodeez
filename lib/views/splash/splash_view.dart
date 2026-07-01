@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/discovery_controller.dart';
+import '../../controllers/location_controller.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
@@ -58,7 +59,7 @@ class _SplashViewState extends ConsumerState<SplashView>
     _enterCtrl.forward();
 
     Future.microtask(() {
-      ref.read(locationResolverProvider).resolve();
+      ref.read(deliveryLocationProvider.notifier).useCurrentLocation(silent: true);
       ref.read(discoveryControllerProvider.notifier).loadInitial();
     });
 

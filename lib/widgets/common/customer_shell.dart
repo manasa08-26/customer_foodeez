@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/cart_controller.dart';
 import '../../controllers/discovery_controller.dart';
+import '../../controllers/location_controller.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../router/route_paths.dart';
+import 'change_location_sheet.dart';
 import 'home_search_bar.dart';
 
 /// Swiggy-style home chrome — location header, search, bottom nav (home only).
@@ -120,8 +122,7 @@ class _HomeTopHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final location = ref.watch(locationResolverProvider).cached;
-    final locationLabel = _locationLabel(location);
+    final location = ref.watch(deliveryLocationProvider);
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -143,51 +144,66 @@ class _HomeTopHeader extends ConsumerWidget {
                 height: AppDimensions.homeHeaderRowHeight,
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.location_on,
-                      size: AppDimensions.homeLocationIconSize,
-                      color: Colors.white.withValues(alpha: 0.95),
-                    ),
-                    const SizedBox(width: AppDimensions.spacingXxs),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'DELIVERY TO',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.6,
-                                  color: Colors.white.withValues(alpha: 0.78),
-                                ),
-                          ),
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  locationLabel,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleSmall
-                                      ?.copyWith(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.white,
+                      child: InkWell(
+                        onTap: () => showChangeLocationSheet(context),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              size: AppDimensions.homeLocationIconSize,
+                              color: Colors.white.withValues(alpha: 0.95),
+                            ),
+                            const SizedBox(width: AppDimensions.spacingXxs),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'DELIVERY TO',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.6,
+                                          color: Colors.white
+                                              .withValues(alpha: 0.78),
+                                        ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          location.label,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w800,
+                                                color: Colors.white,
+                                              ),
+                                        ),
                                       ),
-                                ),
+                                      Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        size: 20,
+                                        color: Colors.white
+                                            .withValues(alpha: 0.92),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                size: 20,
-                                color: Colors.white.withValues(alpha: 0.92),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     _ProfileMenuButton(
@@ -205,14 +221,6 @@ class _HomeTopHeader extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _locationLabel(LocationState location) {
-    if (location.lat == LocationState.fallback.lat &&
-        location.lng == LocationState.fallback.lng) {
-      return 'Hyderabad';
-    }
-    return 'Current location';
   }
 }
 

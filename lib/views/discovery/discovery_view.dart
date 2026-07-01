@@ -69,6 +69,7 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
     final state = ref.watch(discoveryControllerProvider);
     final padding = AppDimensions.pagePadding(context);
     final columns = AppDimensions.restaurantGridColumns(context);
+    final restaurants = state.displayRestaurants;
 
     if (state.error != null && state.restaurants.isEmpty && !state.isLoading) {
       return ErrorStateView(
@@ -118,9 +119,11 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
               title: 'Trending Near You',
               subtitle: state.searchQuery.isNotEmpty
                   ? 'Results for "${state.searchQuery}"'
-                  : (isInitialLoad
-                      ? 'Loading restaurants near you…'
-                      : 'Popular restaurants around you'),
+                  : state.vegOnly
+                      ? 'Showing veg restaurants only'
+                      : (isInitialLoad
+                          ? 'Loading restaurants near you…'
+                          : 'Popular restaurants around you'),
             ),
           ),
           if (isInitialLoad)
@@ -130,12 +133,14 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
                 padding: padding,
               ),
             )
-          else if (state.restaurants.isEmpty)
-            const SliverFillRemaining(
+          else if (restaurants.isEmpty)
+            SliverFillRemaining(
               hasScrollBody: false,
               child: EmptyStateView(
                 title: 'No restaurants found',
-                subtitle: 'Try a different search or location',
+                subtitle: state.vegOnly
+                    ? 'No veg restaurants match your filters'
+                    : 'Try a different search or location',
                 icon: Icons.restaurant_outlined,
               ),
             )
@@ -151,10 +156,10 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
                 gridDelegate: _gridDelegate(columns),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    if (index >= state.restaurants.length) {
+                    if (index >= restaurants.length) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    final restaurant = state.restaurants[index];
+                    final restaurant = restaurants[index];
                     return RestaurantCard(
                       restaurant: restaurant,
                       index: index,
@@ -164,15 +169,15 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
                       ),
                     );
                   },
-                  childCount: state.restaurants.length +
-                      (state.isLoadingMore ? 1 : 0),
+                  childCount:
+                      restaurants.length + (state.isLoadingMore ? 1 : 0),
                 ),
               ),
             ),
-          if (state.restaurants.isNotEmpty) ...[
+          if (restaurants.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: DiscoveryQuickReorderRow(
-                restaurants: state.restaurants,
+                restaurants: restaurants,
                 onRestaurantTap: (r) => context.push(
                   RoutePaths.restaurantDetail(r.branchId),
                   extra: r.name,
@@ -185,7 +190,7 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
                 title: 'Late Night Cravings',
                 subtitle: 'Perfect for midnight hunger pangs',
                 emoji: '🌙',
-                restaurants: state.restaurants.take(6).toList(),
+                restaurants: restaurants.take(6).toList(),
                 onRestaurantTap: (r) => context.push(
                   RoutePaths.restaurantDetail(r.branchId),
                   extra: r.name,
@@ -197,7 +202,7 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
                 title: 'Healthy & Fresh',
                 subtitle: "Good food that's good for you",
                 emoji: '🥗',
-                restaurants: state.restaurants.reversed.take(6).toList(),
+                restaurants: restaurants.reversed.take(6).toList(),
                 onRestaurantTap: (r) => context.push(
                   RoutePaths.restaurantDetail(r.branchId),
                   extra: r.name,

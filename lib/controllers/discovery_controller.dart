@@ -1,56 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 
 import '../core/utils/error_messages.dart';
 import '../data/models/restaurant_model.dart';
 import '../data/repositories/discovery_repository.dart';
-
-/// Cached coordinates for discovery API calls.
-class LocationState {
-  const LocationState({required this.lat, required this.lng});
-
-  final double lat;
-  final double lng;
-
-  static const fallback = LocationState(lat: 17.385, lng: 78.4867);
-}
-
-/// Resolves GPS quickly — last-known first, then low-accuracy with 2s cap.
-final locationResolverProvider = Provider<LocationResolver>((ref) {
-  return LocationResolver();
-});
-
-class LocationResolver {
-  LocationState? _cached;
-
-  LocationState get cached => _cached ?? LocationState.fallback;
-
-  Future<LocationState> resolve({Duration timeout = const Duration(seconds: 2)}) async {
-    if (_cached != null) return _cached!;
-
-    try {
-      final last = await Geolocator.getLastKnownPosition();
-      if (last != null) {
-        _cached = LocationState(lat: last.latitude, lng: last.longitude);
-        return _cached!;
-      }
-    } catch (_) {}
-
-    try {
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: LocationSettings(
-          accuracy: LocationAccuracy.low,
-          timeLimit: timeout,
-        ),
-      ).timeout(timeout);
-      _cached = LocationState(lat: pos.latitude, lng: pos.longitude);
-      return _cached!;
-    } catch (_) {
-      _cached = LocationState.fallback;
-      return _cached!;
-    }
-  }
-}
+import 'location_controller.dart';
 
 class DiscoveryState {
   const DiscoveryState({
@@ -60,6 +13,7 @@ class DiscoveryState {
     this.isLoading = true,
     this.isLoadingMore = false,
     this.searchQuery = '',
+    this.vegOnly = false,
     this.error,
   });
 
@@ -69,7 +23,14 @@ class DiscoveryState {
   final bool isLoading;
   final bool isLoadingMore;
   final String searchQuery;
+  final bool vegOnly;
   final String? error;
+
+  /// Client-side veg filter for home discovery lists.
+  List<RestaurantModel> get displayRestaurants {
+    if (!vegOnly) return restaurants;
+    return restaurants.where((r) => r.isVeg == true).toList();
+  }
 
   DiscoveryState copyWith({
     List<RestaurantModel>? restaurants,
@@ -78,6 +39,7 @@ class DiscoveryState {
     bool? isLoading,
     bool? isLoadingMore,
     String? searchQuery,
+    bool? vegOnly,
     String? error,
     bool clearError = false,
   }) {
@@ -88,6 +50,7 @@ class DiscoveryState {
       isLoading: isLoading ?? this.isLoading,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       searchQuery: searchQuery ?? this.searchQuery,
+      vegOnly: vegOnly ?? this.vegOnly,
       error: clearError ? null : (error ?? this.error),
     );
   }
@@ -99,13 +62,16 @@ class DiscoveryController extends Notifier<DiscoveryState> {
 
   @override
   DiscoveryState build() {
+    ref.listen(deliveryLocationProvider, (prev, next) {
+      if (prev == null) return;
+      if (prev.lat == next.lat && prev.lng == next.lng) return;
+      Future.microtask(() => refresh());
+    });
     Future.microtask(loadInitial);
     return const DiscoveryState();
   }
 
-  Future<LocationState> _location() async {
-    return ref.read(locationResolverProvider).resolve();
-  }
+  DeliveryLocation _location() => ref.read(deliveryLocationProvider);
 
   Future<void> loadInitial() async {
     await _fetchRestaurants(
@@ -122,6 +88,10 @@ class DiscoveryController extends Notifier<DiscoveryState> {
     } else {
       await loadInitial();
     }
+  }
+
+  void toggleVegOnly([bool? value]) {
+    state = state.copyWith(vegOnly: value ?? !state.vegOnly);
   }
 
   Future<void> _fetchRestaurants({
@@ -143,7 +113,7 @@ class DiscoveryController extends Notifier<DiscoveryState> {
     }
 
     try {
-      final loc = await _location();
+      final loc = _location();
       if (generation != _requestGeneration) return;
 
       final repo = ref.read(discoveryRepositoryProvider);
@@ -168,6 +138,7 @@ class DiscoveryController extends Notifier<DiscoveryState> {
           page: page,
           hasMore: result.hasMore,
           searchQuery: trimmedQuery,
+          vegOnly: state.vegOnly,
           isLoading: false,
         );
       } else {

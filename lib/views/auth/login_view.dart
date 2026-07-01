@@ -10,7 +10,7 @@ import '../../core/constants/app_dimensions.dart';
 import '../../core/network/api_exception.dart';
 import '../../data/models/auth_model.dart';
 import '../../widgets/common/customer_logo.dart';
-import 'package:foodeez_customer/widgets/common/google_icon.dart';
+import '../../widgets/common/google_icon.dart';
 import '../../router/app_router.dart';
 import '../../router/route_paths.dart';
 
