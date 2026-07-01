@@ -22,8 +22,20 @@ class _HomeSearchBarState extends ConsumerState<HomeSearchBar> {
   }
 
   void _runSearch(String query) {
+    if (_controller.text != query) {
+      _controller.text = query;
+      _controller.selection = TextSelection.collapsed(offset: query.length);
+    }
     ref.read(discoveryControllerProvider.notifier).search(query);
     setState(() {});
+  }
+
+  void _onQueryChanged(String value) {
+    setState(() {});
+    final activeQuery = ref.read(discoveryControllerProvider).searchQuery;
+    if (value.trim().isEmpty && activeQuery.isNotEmpty) {
+      _runSearch('');
+    }
   }
 
   @override
@@ -79,7 +91,7 @@ class _HomeSearchBarState extends ConsumerState<HomeSearchBar> {
           ),
         ),
         onSubmitted: _runSearch,
-        onChanged: (_) => setState(() {}),
+        onChanged: _onQueryChanged,
       ),
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../core/constants/app_assets.dart';
+import 'package:foodeez_customer/core/constants/app_assets.dart';
 
 /// Official multicolor Google "G" logo.
 class GoogleIcon extends StatelessWidget {

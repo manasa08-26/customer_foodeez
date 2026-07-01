@@ -148,7 +148,7 @@ class _CartViewState extends ConsumerState<CartView> {
                   FilledButton(
                     onPressed: () => context.go(RoutePaths.discovery),
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.customerAccent,
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppDimensions.spacingXl,
@@ -510,7 +510,7 @@ class _OrderSummaryPanel extends StatelessWidget {
           FilledButton(
             onPressed: placing || paymentMethod == null ? null : onPlaceOrder,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.customerAccent,
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -571,10 +571,10 @@ class _OrderSummaryPanel extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppDimensions.spacingMd),
                     decoration: BoxDecoration(
-                      color: AppColors.customerAccentSurface,
+                      color: AppColors.primarySurface,
                       borderRadius:
                           BorderRadius.circular(AppDimensions.radiusLg),
-                      border: Border.all(color: AppColors.customerAccentBorder),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -586,7 +586,7 @@ class _OrderSummaryPanel extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall
-                              ?.copyWith(color: AppColors.customerAccent),
+                              ?.copyWith(color: AppColors.primary),
                         ),
                         const SizedBox(height: AppDimensions.spacingXxs),
                         Text(
@@ -659,7 +659,7 @@ class _OrderSummaryPanel extends StatelessWidget {
                           child: const Text(
                             'REMOVE',
                             style: TextStyle(
-                              color: AppColors.customerAccent,
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -693,7 +693,7 @@ class _OrderSummaryPanel extends StatelessWidget {
                             FilledButton(
                               onPressed: onApplyCoupon,
                               style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.customerAccent,
+                                backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,
                               ),
                               child: const Text('APPLY'),
@@ -804,7 +804,7 @@ class _EmptyAddressCard extends StatelessWidget {
           FilledButton(
             onPressed: onAdd,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.customerAccent,
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
             child: const Text('ADD NEW'),
@@ -830,13 +830,13 @@ class _AddressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: selected
-          ? AppColors.customerAccentSurface
+          ? AppColors.primarySurface
           : Theme.of(context).colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         side: BorderSide(
           color: selected
-              ? AppColors.customerAccent
+              ? AppColors.primary
               : Theme.of(context).dividerColor,
         ),
       ),
@@ -935,13 +935,13 @@ class _PaymentOption extends StatelessWidget {
     final selected = groupValue == value;
     return Material(
       color: selected
-          ? AppColors.customerAccentSurface
+          ? AppColors.primarySurface
           : Theme.of(context).colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         side: BorderSide(
           color: selected
-              ? AppColors.customerAccent
+              ? AppColors.primary
               : Theme.of(context).dividerColor,
         ),
       ),
@@ -966,7 +966,7 @@ class _PaymentOption extends StatelessWidget {
                 value: value,
                 groupValue: groupValue,
                 onChanged: (_) => onSelected(value),
-                activeColor: AppColors.customerAccent,
+                activeColor: AppColors.primary,
               ),
             ],
           ),
@@ -1104,7 +1104,7 @@ class _NoContactTile extends StatelessWidget {
       child: CheckboxListTile(
         value: value,
         onChanged: (v) => onChanged(v ?? false),
-        activeColor: AppColors.customerAccent,
+        activeColor: AppColors.primary,
         title: const Text('Opt in for No-contact Delivery'),
         subtitle: const Text(
           'Unwell, or avoiding contact? Please select no-contact delivery. '

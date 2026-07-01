@@ -10,11 +10,11 @@ import '../../core/constants/app_dimensions.dart';
 import '../../core/network/api_exception.dart';
 import '../../data/models/auth_model.dart';
 import '../../widgets/common/customer_logo.dart';
-import '../../widgets/common/google_icon.dart';
+import 'package:foodeez_customer/widgets/common/google_icon.dart';
 import '../../router/app_router.dart';
 import '../../router/route_paths.dart';
 
-/// Sign-in — purple header + white sheet, OTP flow behind email/OTP fields.
+/// Sign-in — purple header + white sheet, email → OTP flow.
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 
@@ -25,18 +25,17 @@ class LoginView extends ConsumerStatefulWidget {
 class _LoginViewState extends ConsumerState<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
-  final _secretCtrl = TextEditingController();
+  final _otpCtrl = TextEditingController();
   bool _otpSent = false;
   bool _loading = false;
   bool _rememberMe = false;
-  bool _obscureSecret = true;
   String? _error;
   String? _status;
 
   @override
   void dispose() {
     _emailCtrl.dispose();
-    _secretCtrl.dispose();
+    _otpCtrl.dispose();
     super.dispose();
   }
 
@@ -54,7 +53,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
           );
       setState(() {
         _otpSent = true;
-        _secretCtrl.clear();
+        _otpCtrl.clear();
         _status = 'OTP sent to your registered mobile number.';
       });
     } on ApiException catch (e) {
@@ -70,7 +69,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
   }
 
   Future<void> _login() async {
-    if (_secretCtrl.text.trim().length < 4) {
+    if (_otpCtrl.text.trim().length < 4) {
       setState(() => _error = 'Enter a valid OTP');
       return;
     }
@@ -81,7 +80,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
     try {
       await ref.read(authControllerProvider.notifier).login(
             _emailCtrl.text.trim(),
-            _secretCtrl.text.trim(),
+            _otpCtrl.text.trim(),
           );
       if (!mounted) return;
       navigateAfterAuth(context, ref);
@@ -110,9 +109,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    final secretLabel = _otpSent ? 'One-time password' : 'Password';
-    final secretHint =
-        _otpSent ? 'Enter OTP' : 'Enter password or tap Sign in for OTP';
     final topInset = MediaQuery.paddingOf(context).top;
     final sheetTop = topInset + 148;
 
@@ -215,42 +211,46 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         ),
                       ),
                       const SizedBox(height: AppDimensions.spacingLg),
-                      _AuthField(
-                        controller: _emailCtrl,
-                        hint: 'Email address',
-                        icon: Icons.mail_outline_rounded,
-                        keyboardType: TextInputType.emailAddress,
-                        enabled: !_loading,
-                        validator: (v) {
-                          if (v == null || v.isEmpty) return 'Required';
-                          if (!v.contains('@')) return 'Invalid email';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: AppDimensions.spacingMd),
-                      _AuthField(
-                        controller: _secretCtrl,
-                        hint: secretHint,
-                        label: secretLabel,
-                        icon: Icons.lock_outline_rounded,
-                        keyboardType:
-                            _otpSent ? TextInputType.number : TextInputType.text,
-                        obscureText: _obscureSecret && !_otpSent,
-                        enabled: !_loading,
-                        maxLength: _otpSent ? 6 : null,
-                        suffix: IconButton(
-                          onPressed: () => setState(
-                            () => _obscureSecret = !_obscureSecret,
-                          ),
-                          icon: Icon(
-                            _obscureSecret
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            color: AppColors.textHint,
-                            size: 20,
+                      if (!_otpSent) ...[
+                        _AuthField(
+                          controller: _emailCtrl,
+                          hint: 'Email address',
+                          icon: Icons.mail_outline_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          enabled: !_loading,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return 'Required';
+                            if (!v.contains('@')) return 'Invalid email';
+                            return null;
+                          },
+                        ),
+                      ] else ...[
+                        Text(
+                          'OTP sent to the mobile number linked to ',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
                           ),
                         ),
-                      ),
+                        Text(
+                          _emailCtrl.text.trim(),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: AppDimensions.spacingMd),
+                        _AuthField(
+                          controller: _otpCtrl,
+                          hint: 'Enter OTP',
+                          label: 'One-time password',
+                          icon: Icons.lock_outline_rounded,
+                          keyboardType: TextInputType.number,
+                          enabled: !_loading,
+                          maxLength: 6,
+                        ),
+                      ],
                       const SizedBox(height: AppDimensions.spacingSm),
                       Row(
                         children: [
@@ -321,7 +321,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       _GradientSignInButton(
                         label: _loading
                             ? (_otpSent ? 'Verifying…' : 'Sending…')
-                            : 'Sign in',
+                            : (_otpSent ? 'Sign in' : 'Send OTP'),
                         loading: _loading,
                         onPressed: _loading ? null : _onSignIn,
                       ),
@@ -332,7 +332,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                               ? null
                               : () => setState(() {
                                     _otpSent = false;
-                                    _secretCtrl.clear();
+                                    _otpCtrl.clear();
                                     _error = null;
                                     _status = null;
                                   }),

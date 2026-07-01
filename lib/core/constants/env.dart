@@ -8,7 +8,7 @@
 class Env {
   Env._();
 
-  static const String productionApiBaseUrl = 'https://int.foodeez.in/api/v1';
+  static const String productionApiBaseUrl = 'https://int.foodeez.in/customer/api/v1';
 
   /// Customer API (auth, discovery, cart, orders).
   static const String apiBaseUrl = String.fromEnvironment(

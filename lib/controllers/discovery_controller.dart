@@ -95,6 +95,8 @@ class DiscoveryState {
 
 /// MVC Controller for restaurant discovery with pagination and search.
 class DiscoveryController extends Notifier<DiscoveryState> {
+  int _requestGeneration = 0;
+
   @override
   DiscoveryState build() {
     Future.microtask(loadInitial);
@@ -106,98 +108,101 @@ class DiscoveryController extends Notifier<DiscoveryState> {
   }
 
   Future<void> loadInitial() async {
-    if (state.isLoading && state.restaurants.isEmpty) {
-      state = state.copyWith(clearError: true);
-    } else {
-      state = state.copyWith(isLoading: true, clearError: true);
-    }
-
-    try {
-      final loc = await _location();
-      final result = await ref.read(discoveryRepositoryProvider).getNearby(
-            lat: loc.lat,
-            lng: loc.lng,
-            page: 1,
-          );
-      state = DiscoveryState(
-        restaurants: result.items,
-        page: 1,
-        hasMore: result.hasMore,
-        isLoading: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: ErrorMessages.userFriendly(e),
-      );
-    }
-  }
-
-  Future<void> refresh() => loadInitial();
-
-  Future<void> search(String query) async {
-    state = state.copyWith(
-      searchQuery: query,
-      isLoading: true,
-      clearError: true,
+    await _fetchRestaurants(
+      page: 1,
+      searchQuery: '',
+      replace: true,
     );
-    if (query.trim().isEmpty) {
+  }
+
+  Future<void> refresh() async {
+    final query = state.searchQuery;
+    if (query.isNotEmpty) {
+      await search(query);
+    } else {
       await loadInitial();
-      return;
-    }
-    try {
-      final loc = await _location();
-      final result = await ref.read(discoveryRepositoryProvider).search(
-            query: query.trim(),
-            lat: loc.lat,
-            lng: loc.lng,
-          );
-      state = DiscoveryState(
-        restaurants: result.items,
-        page: 1,
-        hasMore: result.hasMore,
-        searchQuery: query,
-        isLoading: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: ErrorMessages.userFriendly(e),
-      );
     }
   }
 
-  Future<void> loadMore() async {
-    if (!state.hasMore || state.isLoadingMore) return;
-    state = state.copyWith(isLoadingMore: true);
+  Future<void> _fetchRestaurants({
+    required int page,
+    required String searchQuery,
+    required bool replace,
+  }) async {
+    final generation = ++_requestGeneration;
+    final trimmedQuery = searchQuery.trim();
+
+    if (replace) {
+      state = state.copyWith(
+        searchQuery: trimmedQuery,
+        isLoading: true,
+        clearError: true,
+      );
+    } else {
+      state = state.copyWith(isLoadingMore: true, clearError: true);
+    }
+
     try {
       final loc = await _location();
-      final nextPage = state.page + 1;
+      if (generation != _requestGeneration) return;
+
       final repo = ref.read(discoveryRepositoryProvider);
-      final result = state.searchQuery.isNotEmpty
+      final result = trimmedQuery.isNotEmpty
           ? await repo.search(
-              query: state.searchQuery,
+              query: trimmedQuery,
               lat: loc.lat,
               lng: loc.lng,
-              page: nextPage,
+              page: page,
             )
           : await repo.getNearby(
               lat: loc.lat,
               lng: loc.lng,
-              page: nextPage,
+              page: page,
             );
-      state = state.copyWith(
-        restaurants: [...state.restaurants, ...result.items],
-        page: nextPage,
-        hasMore: result.hasMore,
-        isLoadingMore: false,
-      );
+
+      if (generation != _requestGeneration) return;
+
+      if (replace) {
+        state = DiscoveryState(
+          restaurants: result.items,
+          page: page,
+          hasMore: result.hasMore,
+          searchQuery: trimmedQuery,
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(
+          restaurants: [...state.restaurants, ...result.items],
+          page: page,
+          hasMore: result.hasMore,
+          isLoadingMore: false,
+        );
+      }
     } catch (e) {
+      if (generation != _requestGeneration) return;
       state = state.copyWith(
+        isLoading: false,
         isLoadingMore: false,
         error: ErrorMessages.userFriendly(e),
       );
     }
+  }
+
+  Future<void> search(String query) async {
+    await _fetchRestaurants(
+      page: 1,
+      searchQuery: query,
+      replace: true,
+    );
+  }
+
+  Future<void> loadMore() async {
+    if (!state.hasMore || state.isLoadingMore || state.isLoading) return;
+    await _fetchRestaurants(
+      page: state.page + 1,
+      searchQuery: state.searchQuery,
+      replace: false,
+    );
   }
 }
 

@@ -16,6 +16,10 @@ class RestaurantCard extends StatelessWidget {
     this.index = 0,
   });
 
+  /// Image + text block height for the home trending grid.
+  static const double discoveryImageHeight = 112.0;
+  static const double discoveryGridExtent = 176.0;
+
   final RestaurantModel restaurant;
   final VoidCallback onTap;
   final int index;
@@ -26,14 +30,20 @@ class RestaurantCard extends StatelessWidget {
     final imageUrl = resolved ??
         CuisineFallbackImages.forCuisine(restaurant.cuisine, index);
 
+    const imageHeight = discoveryImageHeight;
+
     return Card(
+      margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
+            SizedBox(
+              height: imageHeight,
+              width: double.infinity,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -112,9 +122,9 @@ class RestaurantCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppDimensions.spacingSm,
-                AppDimensions.spacingXs,
+                AppDimensions.spacingXxs,
                 AppDimensions.spacingSm,
-                AppDimensions.spacingSm,
+                AppDimensions.spacingXxs,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +147,7 @@ class RestaurantCard extends StatelessWidget {
                   ],
                   if (restaurant.deliveryTime != null ||
                       restaurant.deliveryFee != null) ...[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         if (restaurant.deliveryTime != null)

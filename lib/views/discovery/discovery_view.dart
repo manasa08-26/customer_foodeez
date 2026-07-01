@@ -55,10 +55,13 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
     ref.read(discoveryControllerProvider.notifier).search(query);
   }
 
-  double _gridAspectRatio(BuildContext context, int columns) {
-    if (columns <= 1) return 0.78;
-    if (columns == 2) return 0.72;
-    return 0.68;
+  SliverGridDelegateWithFixedCrossAxisCount _gridDelegate(int columns) {
+    return SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: columns,
+      crossAxisSpacing: AppDimensions.spacingMd,
+      mainAxisSpacing: AppDimensions.spacingMd,
+      mainAxisExtent: RestaurantCard.discoveryGridExtent,
+    );
   }
 
   @override
@@ -145,12 +148,7 @@ class _DiscoveryViewState extends ConsumerState<DiscoveryView> {
                 AppDimensions.spacingMd,
               ),
               sliver: SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: columns,
-                  crossAxisSpacing: AppDimensions.spacingMd,
-                  mainAxisSpacing: AppDimensions.spacingMd,
-                  childAspectRatio: _gridAspectRatio(context, columns),
-                ),
+                gridDelegate: _gridDelegate(columns),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     if (index >= state.restaurants.length) {

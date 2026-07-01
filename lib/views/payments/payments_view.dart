@@ -239,11 +239,7 @@ class _BalanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimensions.spacingXl),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimensions.radius2xl),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1A0800), Color(0xFF3A1200), Color(0xFF1A0800)],
-        ),
+        gradient: AppColors.primaryGradient,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,8 +315,8 @@ class _BalanceActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: filled
-          ? AppColors.customerAccent
-          : Colors.white.withValues(alpha: 0.1),
+          ? Colors.white
+          : Colors.white.withValues(alpha: 0.12),
       borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
       child: InkWell(
         onTap: onTap,
@@ -336,7 +332,7 @@ class _BalanceActionButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 14,
-                color: filled ? const Color(0xFF0D0906) : Colors.white,
+                color: filled ? AppColors.primary : Colors.white,
               ),
               const SizedBox(width: 4),
               Text(
@@ -344,7 +340,7 @@ class _BalanceActionButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: filled ? const Color(0xFF0D0906) : Colors.white,
+                  color: filled ? AppColors.primary : Colors.white,
                 ),
               ),
             ],
@@ -486,11 +482,11 @@ class _TopupPanel extends StatelessWidget {
             // or fixedSize: const Size(double.infinity, 48),
             padding: const EdgeInsets.symmetric(vertical: 12),
             backgroundColor: isSelected
-                ? AppColors.customerAccentSurface
+                ? AppColors.primarySurface
                 : null,
             side: BorderSide(
               color: isSelected
-                  ? AppColors.customerAccent
+                  ? AppColors.primary
                   : Theme.of(context).dividerColor,
             ),
             shape: RoundedRectangleBorder(
@@ -566,8 +562,8 @@ class _TopupPanel extends StatelessWidget {
           FilledButton(
             onPressed: initiating ? null : onSubmit,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.customerAccent,
-              foregroundColor: const Color(0xFF0D0906),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
             child: Text(
@@ -601,10 +597,10 @@ class _GatewayChip extends StatelessWidget {
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
         backgroundColor:
-            selected ? AppColors.customerAccentSurface : null,
+            selected ? AppColors.primarySurface : null,
         side: BorderSide(
           color: selected
-              ? AppColors.customerAccent
+              ? AppColors.primary
               : Theme.of(context).dividerColor,
         ),
       ),
@@ -845,7 +841,7 @@ class _SavedPaymentTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.customerAccent,
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
               ),
               child: Text(
@@ -853,7 +849,7 @@ class _SavedPaymentTile extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF0D0906),
+                  color: Colors.white,
                 ),
               ),
             ),

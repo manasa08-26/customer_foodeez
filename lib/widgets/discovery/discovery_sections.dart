@@ -517,7 +517,7 @@ class DiscoveryRestaurantCarousel extends StatelessWidget {
         ),
         const SizedBox(height: AppDimensions.spacingSm),
         SizedBox(
-          height: 196,
+          height: 168,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: padding),
@@ -567,7 +567,7 @@ class _HorizontalRestaurantTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(
-                height: 120,
+                height: 88,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -585,7 +585,7 @@ class _HorizontalRestaurantTile extends StatelessWidget {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      height: 48,
+                      height: 40,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(

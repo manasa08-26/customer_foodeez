@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../core/constants/app_dimensions.dart';
+import '../common/restaurant_card.dart';
 
 /// Shimmer placeholders while restaurants load.
 class DiscoveryLoadingSkeleton extends StatelessWidget {
@@ -31,7 +32,7 @@ class DiscoveryLoadingSkeleton extends StatelessWidget {
             crossAxisCount: columns,
             crossAxisSpacing: AppDimensions.spacingMd,
             mainAxisSpacing: AppDimensions.spacingMd,
-            childAspectRatio: columns <= 1 ? 0.78 : 0.72,
+            mainAxisExtent: RestaurantCard.discoveryGridExtent,
           ),
           itemCount: columns * 2,
           itemBuilder: (_, __) => Container(
