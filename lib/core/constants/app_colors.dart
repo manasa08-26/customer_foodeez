@@ -1,162 +1,128 @@
 import 'package:flutter/material.dart';
 
-/// Brand palette — matches flutter_foodeez restaurant app.
+/// Brand palette — light theme only: white + #692B7E purple.
 class AppColors {
   AppColors._();
 
-  // Primary purple palette
-  static const Color primary = Color(0xFF6D3FC8);
-  static const Color primaryLight = Color(0xFF9B7AE8);
-  static const Color primaryDark = Color(0xFF45227E);
-  static const Color primarySurface = Color(0xFFF2ECFF);
+  /// Brand purple — FooDeeZ customer theme.
+  static const Color primary = Color(0xFF692B7E);
+  static const Color primaryLight = Color(0xFF8E4FA3);
+  static const Color primaryDark = Color(0xFF4E2060);
+  static const Color primarySurface = Color(0xFFF4ECF7);
 
-  // Accent
-  static const Color accent = Color(0xFFB083F0);
-  static const Color accentLight = Color(0xFFE9D8FD);
-
-  /// Customer web parity — cart / wallet CTAs (foodeez_frontend-dev).
-  static const Color customerAccent = Color(0xFFB88A2E);
-  static const Color customerAccentSurface = Color(0xFFFEF5E6);
-  static const Color customerAccentBorder = Color(0xFFF7D19A);
+  // Accent (same family)
+  static const Color accent = Color(0xFF7D3A96);
+  static const Color accentLight = Color(0xFFE8D4EF);
 
   // Neutrals
   static const Color white = Color(0xFFFFFFFF);
-  static const Color background = Color(0xFFFAF8FD);
+  static const Color black = Color(0xFF000000);
+  static const Color background = Color(0xFFFAFAFA);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color cardBorder = Color(0xFFEAE5F4);
+  static const Color cardSurface = Color(0xFFFFFFFF);
+  static const Color cardBorder = Color(0xFFE8DCEC);
 
-  // Auth screens use the same soft background as the rest of the app.
   static const Color authBackground = background;
 
-  // Dark palette
-  static const Color darkBackground = Color(0xFF0F0E12);
-  static const Color darkSurface = Color(0xFF17161C);
-  static const Color darkSurfaceElevated = Color(0xFF1F1E25);
-  static const Color darkSurfaceHighlight = Color(0xFF29282F);
-  static const Color darkCardBorder = Color(0xFF323138);
-  static const Color darkDivider = Color(0xFF2A2932);
-  static const Color darkTextPrimary = Color(0xFFF2F0F5);
-  static const Color darkTextSecondary = Color(0xFFA8A3B3);
-  static const Color darkTextHint = Color(0xFF6F6B78);
-  static const Color darkPrimarySurface = Color(0xFF2B2340);
-  static const Color darkSuccessSurface = Color(0xFF173225);
-  static const Color darkWarningSurface = Color(0xFF3A2E18);
-  static const Color darkErrorSurface = Color(0xFF3A1E22);
-  static const Color darkInfoSurface = Color(0xFF1A2740);
-
   // Text
-  static const Color textPrimary = Color(0xFF181125);
-  static const Color textSecondary = Color(0xFF667085);
-  static const Color textHint = Color(0xFF9CA3AF);
+  static const Color textPrimary = Color(0xFF1A1A1A);
+  static const Color textSecondary = Color(0xFF6B6B6B);
+  static const Color textHint = Color(0xFF9E9E9E);
 
-  // Status
-  static const Color success = Color(0xFF22C55E);
-  static const Color successSurface = Color(0xFFDCFCE7);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color warningSurface = Color(0xFFFEF3C7);
-  static const Color error = Color(0xFFEF4444);
-  static const Color errorSurface = Color(0xFFFEE2E2);
-  static const Color info = Color(0xFF3B82F6);
-  static const Color infoSurface = Color(0xFFDBEAFE);
+  // Text on purple surfaces
+  static const Color onPrimary = white;
 
-  // Veg / non-veg
-  static const Color veg = Color(0xFF16A34A);
-  static const Color nonVeg = Color(0xFFEF4444);
+  // Status (muted greys + purple where needed)
+  static const Color success = Color(0xFF2E7D32);
+  static const Color successSurface = Color(0xFFE8F5E9);
+  static const Color warning = Color(0xFF6B6B6B);
+  static const Color warningSurface = Color(0xFFF5F5F5);
+  static const Color error = Color(0xFF692B7E);
+  static const Color errorSurface = Color(0xFFF4ECF7);
+  static const Color info = Color(0xFF692B7E);
+  static const Color infoSurface = Color(0xFFF4ECF7);
+
+  // Veg / non-veg — standard green / red indicators
+  static const Color veg = Color(0xFF2E7D32);
+  static const Color nonVeg = Color(0xFFC62828);
 
   // Order status
-  static const Color statusPlaced = Color(0xFF3B82F6);
-  static const Color statusAccepted = Color(0xFF8B5CF6);
-  static const Color statusPreparing = Color(0xFFF59E0B);
-  static const Color statusReady = Color(0xFF22C55E);
-  static const Color statusOnTheWay = Color(0xFF06B6D4);
-  static const Color statusDelivering = Color(0xFF06B6D4);
-  static const Color statusDelivered = Color(0xFF22C55E);
-  static const Color statusCancelled = Color(0xFFEF4444);
+  static const Color statusPlaced = Color(0xFF692B7E);
+  static const Color statusAccepted = Color(0xFF8E4FA3);
+  static const Color statusPreparing = Color(0xFF6B6B6B);
+  static const Color statusReady = Color(0xFF4A4A4A);
+  static const Color statusOnTheWay = Color(0xFF692B7E);
+  static const Color statusDelivering = Color(0xFF692B7E);
+  static const Color statusDelivered = Color(0xFF4A4A4A);
+  static const Color statusCancelled = Color(0xFF1A1A1A);
 
   // Divider & border
-  static const Color divider = Color(0xFFEAE5F4);
-  static const Color border = Color(0xFFE7E1F2);
+  static const Color divider = Color(0xFFE8DCEC);
+  static const Color border = Color(0xFFE8DCEC);
 
-  // Gradients
+  // Gradients — purple only
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF6C3FC5), Color(0xFF8B5CF6)],
+    colors: [Color(0xFF692B7E), Color(0xFF8E4FA3)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient cardGradient = LinearGradient(
-    colors: [Color(0xFF8B5CF6), Color(0xFFB083F0)],
+    colors: [Color(0xFF692B7E), Color(0xFF7D3A96)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const LinearGradient darkHeroGradient = LinearGradient(
-    colors: [Color(0xFF1A1528), Color(0xFF3D2A6E)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  // Legacy aliases — light theme only; map old dark/gold tokens to brand purple.
+  static const Color gold = primary;
+  static const Color darkBackground = black;
+  static const Color darkSurfaceElevated = surface;
+  static const Color darkSurfaceHighlight = background;
+  static const Color darkCardBorder = cardBorder;
+  static const Color darkDivider = divider;
+  static const Color darkPrimarySurface = primarySurface;
+  static const Color darkTextPrimary = white;
+  static const Color darkTextSecondary = textSecondary;
+  static const Color darkTextHint = textHint;
+  static const Color customerAccent = primary;
+  static const LinearGradient darkGoldGradient = primaryGradient;
+
+  static LinearGradient headerGradientFor(bool isDark) => primaryGradient;
+
+  /// Legacy call sites use `AppColors.headerGradient(isDark)`.
+  static LinearGradient headerGradient(bool isDark) => primaryGradient;
 }
 
-/// Theme-aware color accessors.
+/// Theme-aware color accessors — light theme only.
 class AdaptiveAppColors {
-  const AdaptiveAppColors._(this._isDark);
-
-  final bool _isDark;
+  const AdaptiveAppColors._();
 
   factory AdaptiveAppColors.of(BuildContext context) =>
-      AdaptiveAppColors._(Theme.of(context).brightness == Brightness.dark);
+      const AdaptiveAppColors._();
 
-  bool get isDark => _isDark;
+  bool get isDark => false;
 
-  Color get background =>
-      _isDark ? AppColors.darkBackground : AppColors.background;
-
-  Color get surface =>
-      _isDark ? AppColors.darkSurfaceElevated : AppColors.white;
-
-  Color get surfaceContainer =>
-      _isDark ? AppColors.darkSurface : AppColors.surface;
-
-  Color get surfaceHighlight =>
-      _isDark ? AppColors.darkSurfaceHighlight : AppColors.background;
-
-  Color get cardBorder =>
-      _isDark ? AppColors.darkCardBorder : AppColors.cardBorder;
-
-  Color get textPrimary =>
-      _isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-
-  Color get textSecondary =>
-      _isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
-
-  Color get textHint => _isDark ? AppColors.darkTextHint : AppColors.textHint;
-
-  Color get primarySurface =>
-      _isDark ? AppColors.darkPrimarySurface : AppColors.primarySurface;
-
-  Color get primaryColor =>
-      _isDark ? AppColors.primaryLight : AppColors.primary;
-
-  Color get successSurface =>
-      _isDark ? AppColors.darkSuccessSurface : AppColors.successSurface;
-
-  Color get errorSurface =>
-      _isDark ? AppColors.darkErrorSurface : AppColors.errorSurface;
-
-  Color get warningSurface =>
-      _isDark ? AppColors.darkWarningSurface : AppColors.warningSurface;
-
-  Color get infoSurface =>
-      _isDark ? AppColors.darkInfoSurface : AppColors.infoSurface;
-
-  Color get cardShadow => _isDark
-      ? Colors.black.withValues(alpha: 0.42)
-      : Colors.black.withValues(alpha: 0.035);
-
+  Color get background => AppColors.background;
+  Color get surface => AppColors.white;
+  Color get surfaceContainer => AppColors.surface;
+  Color get surfaceHighlight => AppColors.background;
+  Color get cardBorder => AppColors.cardBorder;
+  Color get textPrimary => AppColors.textPrimary;
+  Color get textSecondary => AppColors.textSecondary;
+  Color get textHint => AppColors.textHint;
+  Color get errorText => AppColors.error;
+  Color get linkText => AppColors.primary;
+  Color get primaryColor => AppColors.primary;
+  Color get onPrimaryColor => AppColors.white;
+  Color get primarySurface => AppColors.primarySurface;
+  Color get successSurface => AppColors.successSurface;
+  Color get errorSurface => AppColors.errorSurface;
+  Color get warningSurface => AppColors.warningSurface;
+  Color get infoSurface => AppColors.infoSurface;
+  Color get cardShadow => Colors.black.withValues(alpha: 0.035);
   LinearGradient get primaryGradient => AppColors.primaryGradient;
-
-  LinearGradient get cardGradient =>
-      _isDark ? AppColors.darkHeroGradient : AppColors.cardGradient;
+  LinearGradient get headerGradient => AppColors.primaryGradient;
+  LinearGradient get cardGradient => AppColors.cardGradient;
 }
 
 extension AdaptiveAppColorsContext on BuildContext {

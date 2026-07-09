@@ -88,25 +88,7 @@ class _AuthBrandHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          height: 64,
-          width: 180,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 8,
-              ),
-            ],
-          ),
-          child: const CustomerLogo.auth(
-            asset: AppAssets.customerLight,
-          ),
-        ),
+        const CustomerLogo.auth(asset: AppAssets.customerLight),
         const SizedBox(height: AppDimensions.spacingSm),
         Text(
           subtitle.toUpperCase(),

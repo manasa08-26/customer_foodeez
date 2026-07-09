@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/constants/app_assets.dart';
+import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 
 /// Cinematic hero banner with looping background video (web discovery).
@@ -38,8 +39,13 @@ class _HeroVideoBannerState extends State<HeroVideoBanner> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final height = MediaQuery.sizeOf(context).height * 0.38;
     final clampedHeight = height.clamp(260.0, 420.0);
+    final overlayBase =
+        isDark ? AppColors.darkBackground : const Color(0xFF04000F);
+    final bottomFade =
+        isDark ? AppColors.darkBackground : const Color(0xFF0B0022);
 
     return Container(
       height: clampedHeight,
@@ -52,7 +58,7 @@ class _HeroVideoBannerState extends State<HeroVideoBanner> {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-        color: const Color(0xFF04000F),
+        color: overlayBase,
       ),
       child: Stack(
         fit: StackFit.expand,
@@ -67,23 +73,21 @@ class _HeroVideoBannerState extends State<HeroVideoBanner> {
               ),
             )
           else
-            const Center(child: CircularProgressIndicator(color: Colors.white54)),
-          // Left gradient overlay (web style)
+            Center(child: CircularProgressIndicator(color: Colors.white54)),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
                 colors: [
-                  const Color(0xFF04000F).withValues(alpha: 0.92),
-                  const Color(0xFF04000F).withValues(alpha: 0.45),
+                  overlayBase.withValues(alpha: 0.92),
+                  overlayBase.withValues(alpha: 0.45),
                   Colors.transparent,
                 ],
                 stops: const [0.0, 0.45, 0.85],
               ),
             ),
           ),
-          // Bottom fade
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -93,7 +97,7 @@ class _HeroVideoBannerState extends State<HeroVideoBanner> {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    const Color(0xFF0B0022).withValues(alpha: 0.9),
+                    bottomFade.withValues(alpha: 0.9),
                     Colors.transparent,
                   ],
                 ),

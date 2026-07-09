@@ -147,18 +147,6 @@ class _CartViewState extends ConsumerState<CartView> {
                   const SizedBox(height: AppDimensions.spacingLg),
                   FilledButton(
                     onPressed: () => context.go(RoutePaths.discovery),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimensions.spacingXl,
-                        vertical: AppDimensions.spacingMd,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusXl),
-                      ),
-                    ),
                     child: const Text('Explore restaurants'),
                   ),
                 ],
@@ -510,12 +498,7 @@ class _OrderSummaryPanel extends StatelessWidget {
           FilledButton(
             onPressed: placing || paymentMethod == null ? null : onPlaceOrder,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radius2xl),
-              ),
             ),
             child: Text(
               placing ? 'Placing order…' : 'Proceed to Pay',
@@ -564,6 +547,8 @@ class _OrderSummaryPanel extends StatelessWidget {
   }
 
   Widget _buildOrderBody(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final adaptive = context.adaptive;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -571,10 +556,10 @@ class _OrderSummaryPanel extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppDimensions.spacingMd),
                     decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
-                      borderRadius:
-                          BorderRadius.circular(AppDimensions.radiusLg),
-                      border: Border.all(color: AppColors.border),
+                      color: scheme.primaryContainer,
+                      border: Border(
+                        bottom: BorderSide(color: adaptive.cardBorder),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -586,7 +571,9 @@ class _OrderSummaryPanel extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall
-                              ?.copyWith(color: AppColors.primary),
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                         const SizedBox(height: AppDimensions.spacingXxs),
                         Text(
@@ -611,18 +598,6 @@ class _OrderSummaryPanel extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(AppDimensions.spacingMd),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.radiusLg),
-                  ),
-                  child: Text(
-                    'Any suggestions? We will pass it on...',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
                 const SizedBox(height: AppDimensions.spacingMd),
                 _NoContactTile(
                   value: noContact,
@@ -630,12 +605,9 @@ class _OrderSummaryPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: AppDimensions.spacingMd),
                 if (cart.couponCode != null)
-                  Container(
-                    padding: const EdgeInsets.all(AppDimensions.spacingMd),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerLow,
-                      borderRadius:
-                          BorderRadius.circular(AppDimensions.radiusLg),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: AppDimensions.spacingMd,
                     ),
                     child: Row(
                       children: [
@@ -648,7 +620,7 @@ class _OrderSummaryPanel extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleSmall,
                               ),
                               Text(
-                                'Offer applied on the bill',
+                                'Coupon applied',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],
@@ -656,10 +628,10 @@ class _OrderSummaryPanel extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: onRemoveCoupon,
-                          child: const Text(
-                            'REMOVE',
+                          child: Text(
+                            'Remove',
                             style: TextStyle(
-                              color: AppColors.primary,
+                              color: scheme.primary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -668,48 +640,40 @@ class _OrderSummaryPanel extends StatelessWidget {
                     ),
                   )
                 else
-                  Container(
-                    padding: const EdgeInsets.all(AppDimensions.spacingMd),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerLow,
-                      borderRadius:
-                          BorderRadius.circular(AppDimensions.radiusLg),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: AppDimensions.spacingMd,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: couponCtrl,
-                                decoration: const InputDecoration(
-                                  hintText: 'Coupon code',
-                                  isDense: true,
-                                ),
-                              ),
+                        Expanded(
+                          child: TextField(
+                            controller: couponCtrl,
+                            decoration: const InputDecoration(
+                              hintText: 'Coupon code',
+                              isDense: true,
                             ),
-                            const SizedBox(width: AppDimensions.spacingSm),
-                            FilledButton(
-                              onPressed: onApplyCoupon,
-                              style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Text('APPLY'),
-                            ),
-                          ],
-                        ),
-                        if (couponMsg != null) ...[
-                          const SizedBox(height: AppDimensions.spacingSm),
-                          Text(
-                            couponMsg!,
-                            style: Theme.of(context).textTheme.bodySmall,
                           ),
-                        ],
+                        ),
+                        const SizedBox(width: AppDimensions.spacingSm),
+                        FilledButton(
+                          onPressed: onApplyCoupon,
+                          child: const Text('Apply'),
+                        ),
                       ],
                     ),
                   ),
+                if (couponMsg != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: AppDimensions.spacingMd,
+                    ),
+                    child: Text(
+                      couponMsg!,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppDimensions.spacingMd),
                 _BillBreakdown(cart: cart, currency: currency),
                 const SizedBox(height: AppDimensions.spacingMd),
@@ -747,22 +711,8 @@ class _PanelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: padding ?? const EdgeInsets.all(AppDimensions.spacingLg),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.7),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: child,
     );
   }
@@ -775,21 +725,10 @@ class _EmptyAddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppDimensions.spacingXl),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        border: Border.all(
-          color: Theme.of(context).dividerColor,
-          style: BorderStyle.solid,
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingLg),
       child: Column(
         children: [
-          const Text('📍', style: TextStyle(fontSize: 28)),
-          const SizedBox(height: AppDimensions.spacingSm),
           Text(
             'No delivery address saved',
             style: Theme.of(context).textTheme.titleSmall,
@@ -803,11 +742,7 @@ class _EmptyAddressCard extends StatelessWidget {
           const SizedBox(height: AppDimensions.spacingLg),
           FilledButton(
             onPressed: onAdd,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('ADD NEW'),
+            child: const Text('Add address'),
           ),
         ],
       ),
@@ -828,87 +763,42 @@ class _AddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: selected
-          ? AppColors.primarySurface
-          : Theme.of(context).colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        side: BorderSide(
-          color: selected
-              ? AppColors.primary
-              : Theme.of(context).dividerColor,
-        ),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.spacingLg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    final scheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingSm),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: scheme.primary,
+              size: 22,
+            ),
+            const SizedBox(width: AppDimensions.spacingSm),
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          address.label,
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: AppDimensions.spacingSm),
-                        Text(
-                          address.addressLine1,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        Text(
-                          address.city,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
+                  Text(
+                    address.label,
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.spacingSm,
-                      vertical: AppDimensions.spacingXs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius:
-                          BorderRadius.circular(AppDimensions.radiusPill),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      'DELIVER HERE',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                    ),
+                  const SizedBox(height: AppDimensions.spacingXxs),
+                  Text(
+                    address.addressLine1,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  Text(
+                    address.city,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),
-              const SizedBox(height: AppDimensions.spacingSm),
-              Text(
-                '51 MINS',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.5),
-                    ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -933,43 +823,30 @@ class _PaymentOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selected = groupValue == value;
-    return Material(
-      color: selected
-          ? AppColors.primarySurface
-          : Theme.of(context).colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        side: BorderSide(
-          color: selected
-              ? AppColors.primary
-              : Theme.of(context).dividerColor,
-        ),
-      ),
-      child: InkWell(
-        onTap: () => onSelected(value),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.spacingMd),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.titleSmall),
-                    const SizedBox(height: AppDimensions.spacingXxs),
-                    Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                ),
+    final scheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: () => onSelected(value),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingSm),
+        child: Row(
+          children: [
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: scheme.primary,
+              size: 22,
+            ),
+            const SizedBox(width: AppDimensions.spacingSm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: Theme.of(context).textTheme.titleSmall),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+                ],
               ),
-              Radio<String>(
-                value: value,
-                groupValue: groupValue,
-                onChanged: (_) => onSelected(value),
-                activeColor: AppColors.primary,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -991,12 +868,8 @@ class _CartLineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacingMd),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingSm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1004,21 +877,11 @@ class _CartLineItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.name,
-                      style: Theme.of(context).textTheme.titleSmall,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppDimensions.spacingSm),
-                    Text(
-                      'Customize',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
+                child: Text(
+                  item.name,
+                  style: Theme.of(context).textTheme.titleSmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Row(
@@ -1036,7 +899,7 @@ class _CartLineItem extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppDimensions.spacingMd),
+          const SizedBox(height: AppDimensions.spacingSm),
           Row(
             children: [
               Text(
@@ -1050,6 +913,7 @@ class _CartLineItem extends StatelessWidget {
               ),
             ],
           ),
+          Divider(height: 24, color: Theme.of(context).dividerColor),
         ],
       ),
     );
@@ -1064,22 +928,16 @@ class _QtyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      shape: const CircleBorder(
-        side: BorderSide(color: AppColors.cardBorder),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: Center(
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: SizedBox(
+        width: 36,
+        height: 36,
+        child: Center(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
       ),
@@ -1095,26 +953,14 @@ class _NoContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        side: BorderSide(color: Theme.of(context).dividerColor),
-      ),
-      child: CheckboxListTile(
-        value: value,
-        onChanged: (v) => onChanged(v ?? false),
-        activeColor: AppColors.primary,
-        title: const Text('Opt in for No-contact Delivery'),
-        subtitle: const Text(
-          'Unwell, or avoiding contact? Please select no-contact delivery. '
-          'Partner will safely place the order outside your door (not for COD)',
-        ),
-        controlAffinity: ListTileControlAffinity.leading,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacingMd,
-        ),
-      ),
+    return CheckboxListTile(
+      value: value,
+      onChanged: (v) => onChanged(v ?? false),
+      activeColor: Theme.of(context).colorScheme.primary,
+      title: const Text('No-contact delivery'),
+      subtitle: const Text('Leave order at the door'),
+      controlAffinity: ListTileControlAffinity.leading,
+      contentPadding: EdgeInsets.zero,
     );
   }
 }
@@ -1127,30 +973,25 @@ class _BillBreakdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacingMd),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-      ),
-      child: Column(
-        children: [
-          _BillRow(label: 'Item Total', value: currency.format(cart.subtotal)),
-          _BillRow(
-            label: 'Delivery Fee | ${cart.deliveryFee == 0 ? '0 km' : '2.6 kms'}',
-            value: currency.format(cart.deliveryFee),
-          ),
-          _BillRow(
-            label: 'Item Discount',
-            value: '−${currency.format(cart.effectiveCouponDiscount)}',
-            valueColor: Colors.green.shade700,
-          ),
-          _BillRow(
-            label: 'GST & Other Charges',
-            value: currency.format(cart.taxAmount),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        _BillRow(label: 'Item total', value: currency.format(cart.subtotal)),
+        _BillRow(
+          label: 'Delivery fee',
+          value: currency.format(cart.deliveryFee),
+        ),
+        _BillRow(
+          label: 'Discount',
+          value: '−${currency.format(cart.effectiveCouponDiscount)}',
+          valueColor: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.gold
+              : Colors.green.shade700,
+        ),
+        _BillRow(
+          label: 'Taxes',
+          value: currency.format(cart.taxAmount),
+        ),
+      ],
     );
   }
 }

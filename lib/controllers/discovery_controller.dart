@@ -8,6 +8,8 @@ import 'location_controller.dart';
 class DiscoveryState {
   const DiscoveryState({
     this.restaurants = const [],
+    this.trending = const [],
+    this.popularDishes = const [],
     this.page = 1,
     this.hasMore = true,
     this.isLoading = true,
@@ -18,6 +20,8 @@ class DiscoveryState {
   });
 
   final List<RestaurantModel> restaurants;
+  final List<RestaurantModel> trending;
+  final List<dynamic> popularDishes;
   final int page;
   final bool hasMore;
   final bool isLoading;
@@ -34,6 +38,8 @@ class DiscoveryState {
 
   DiscoveryState copyWith({
     List<RestaurantModel>? restaurants,
+    List<RestaurantModel>? trending,
+    List<dynamic>? popularDishes,
     int? page,
     bool? hasMore,
     bool? isLoading,
@@ -45,6 +51,8 @@ class DiscoveryState {
   }) {
     return DiscoveryState(
       restaurants: restaurants ?? this.restaurants,
+      trending: trending ?? this.trending,
+      popularDishes: popularDishes ?? this.popularDishes,
       page: page ?? this.page,
       hasMore: hasMore ?? this.hasMore,
       isLoading: isLoading ?? this.isLoading,
@@ -79,6 +87,24 @@ class DiscoveryController extends Notifier<DiscoveryState> {
       searchQuery: '',
       replace: true,
     );
+    await _loadDiscoveryExtras();
+  }
+
+  Future<void> _loadDiscoveryExtras() async {
+    try {
+      final loc = _location();
+      final repo = ref.read(discoveryRepositoryProvider);
+      final results = await Future.wait([
+        repo.getTrending(lat: loc.lat, lng: loc.lng),
+        repo.getPopularDishes(lat: loc.lat, lng: loc.lng),
+      ]);
+      state = state.copyWith(
+        trending: results[0] as List<RestaurantModel>,
+        popularDishes: results[1] as List<dynamic>,
+      );
+    } catch (_) {
+      // Optional feeds — home still works from nearby API.
+    }
   }
 
   Future<void> refresh() async {
@@ -135,6 +161,8 @@ class DiscoveryController extends Notifier<DiscoveryState> {
       if (replace) {
         state = DiscoveryState(
           restaurants: result.items,
+          trending: state.trending,
+          popularDishes: state.popularDishes,
           page: page,
           hasMore: result.hasMore,
           searchQuery: trimmedQuery,

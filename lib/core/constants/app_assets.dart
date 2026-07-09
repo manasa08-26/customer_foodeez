@@ -18,6 +18,13 @@ class AppAssets {
   static const String heroVideo = 'assets/images/herosection.mp4';
   static const String biryani = 'assets/images/biriyanipng.png';
 
+  static const List<String> homeBanners = [
+    'assets/images/offer_40off.png',
+    'assets/images/offer_bogo.png',
+    'assets/images/offer_cashback.png',
+    'assets/images/offer_free_delivery.png',
+  ];
+
   // Social / auth
   static const String googleIcon = 'assets/icons/google.png';
 }

@@ -8,11 +8,13 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/order_controller.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/theme/reference_colors.dart';
 import '../../data/models/order_model.dart';
 import '../../router/route_paths.dart';
 import '../../widgets/common/empty_state_view.dart';
 import '../../widgets/common/error_state_view.dart';
 import '../../widgets/common/loading_view.dart';
+import '../../widgets/common/shell_tab_header.dart';
 
 /// Order history with All / Live / Past tabs.
 class OrdersView extends ConsumerStatefulWidget {
@@ -54,38 +56,44 @@ class _OrdersViewState extends ConsumerState<OrdersView> {
     final padding = AppDimensions.pagePadding(context);
     final currency = NumberFormat.currency(symbol: '₹', decimalDigits: 0);
 
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.all(padding),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final compact = constraints.maxWidth < 380;
-              final filter = SegmentedButton<OrderFilter>(
-                segments: const [
-                  ButtonSegment(value: OrderFilter.all, label: Text('All')),
-                  ButtonSegment(value: OrderFilter.live, label: Text('Live')),
-                  ButtonSegment(value: OrderFilter.past, label: Text('Past')),
-                ],
-                selected: {state.filter},
-                onSelectionChanged: (s) => ref
-                    .read(orderControllerProvider.notifier)
-                    .setFilter(s.first),
-              );
+    return Scaffold(
+      backgroundColor: ReferenceColors.bg(context),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const ShellTabHeader(title: 'Orders'),
+            Padding(
+              padding: EdgeInsets.all(padding),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final compact = constraints.maxWidth < 380;
+                  final filter = SegmentedButton<OrderFilter>(
+                    segments: const [
+                      ButtonSegment(value: OrderFilter.all, label: Text('All')),
+                      ButtonSegment(value: OrderFilter.live, label: Text('Live')),
+                      ButtonSegment(value: OrderFilter.past, label: Text('Past')),
+                    ],
+                    selected: {state.filter},
+                    onSelectionChanged: (s) => ref
+                        .read(orderControllerProvider.notifier)
+                        .setFilter(s.first),
+                  );
 
-              if (compact) {
-                return filter;
-              }
+                  if (compact) {
+                    return filter;
+                  }
 
-              return Align(
-                alignment: Alignment.centerRight,
-                child: filter,
-              );
-            },
-          ),
+                  return Align(
+                    alignment: Alignment.centerRight,
+                    child: filter,
+                  );
+                },
+              ),
+            ),
+            Expanded(child: _buildList(state, padding, currency)),
+          ],
         ),
-        Expanded(child: _buildList(state, padding, currency)),
-      ],
+      ),
     );
   }
 
@@ -143,7 +151,10 @@ class _OrderCard extends StatelessWidget {
   final NumberFormat currency;
   final VoidCallback onTap;
 
-  Color get _statusColor {
+  Color _statusColor(BuildContext context) {
+    if (Theme.of(context).brightness == Brightness.dark) {
+      return AppColors.gold;
+    }
     switch (order.status.toUpperCase()) {
       case 'DELIVERED':
         return AppColors.statusDelivered;
@@ -191,14 +202,14 @@ class _OrderCard extends StatelessWidget {
                         vertical: AppDimensions.spacingXxs,
                       ),
                       decoration: BoxDecoration(
-                        color: _statusColor.withValues(alpha: 0.12),
+                        color: _statusColor(context).withValues(alpha: 0.12),
                         borderRadius:
                             BorderRadius.circular(AppDimensions.radiusPill),
                       ),
                       child: Text(
                         order.status.replaceAll('_', ' '),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: _statusColor,
+                              color: _statusColor(context),
                             ),
                       ),
                     ),

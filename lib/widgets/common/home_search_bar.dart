@@ -123,6 +123,11 @@ class _VegOnlyToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark ? AppColors.gold : AppColors.veg;
+    final inactiveText =
+        isDark ? AppColors.white : AppColors.textSecondary;
+
     return Material(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
@@ -140,9 +145,9 @@ class _VegOnlyToggle extends StatelessWidget {
                   width: 14,
                   height: 14,
                   decoration: BoxDecoration(
-                    color: value ? AppColors.veg : Colors.transparent,
+                    color: value ? accentColor : Colors.transparent,
                     border: Border.all(
-                      color: AppColors.veg,
+                      color: accentColor,
                       width: 1.5,
                     ),
                     borderRadius: BorderRadius.circular(2),
@@ -154,7 +159,7 @@ class _VegOnlyToggle extends StatelessWidget {
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.4,
-                        color: value ? AppColors.veg : AppColors.textSecondary,
+                        color: value ? accentColor : inactiveText,
                       ),
                 ),
                 Transform.scale(
@@ -163,7 +168,9 @@ class _VegOnlyToggle extends StatelessWidget {
                     value: value,
                     onChanged: onChanged,
                     activeThumbColor: Colors.white,
-                    activeTrackColor: AppColors.veg,
+                    activeTrackColor: isDark
+                        ? AppColors.gold
+                        : AppColors.veg,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),

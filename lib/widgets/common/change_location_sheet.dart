@@ -88,6 +88,8 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
   Widget build(BuildContext context) {
     final current = ref.watch(deliveryLocationProvider);
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottom),
@@ -141,10 +143,16 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
                     hintText: 'Enter area, city or landmark',
                     prefixIcon: const Icon(Icons.location_on_outlined),
                     filled: true,
-                    fillColor: const Color(0xFFF8F7FB),
+                    fillColor: isDark
+                        ? AppColors.darkSurfaceHighlight
+                        : const Color(0xFFF8F7FB),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.darkCardBorder
+                            : AppColors.border,
+                      ),
                     ),
                   ),
                 ),
@@ -165,7 +173,9 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1,
-                        color: AppColors.textSecondary,
+                        color: isDark
+                            ? AppColors.gold
+                            : AppColors.textSecondary,
                       ),
                 ),
                 const SizedBox(height: AppDimensions.spacingSm),
@@ -178,8 +188,8 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
                       label: Text(city.label),
                       selected: selected,
                       onSelected: _loading ? null : (_) => _pickPreset(city),
-                      selectedColor: AppColors.primarySurface,
-                      checkmarkColor: AppColors.primary,
+                      selectedColor: scheme.primaryContainer,
+                      checkmarkColor: scheme.primary,
                     );
                   }).toList(),
                 ),
@@ -188,7 +198,7 @@ class _ChangeLocationSheetState extends ConsumerState<_ChangeLocationSheet> {
                   Text(
                     _error!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.error,
+                          color: isDark ? AppColors.gold : AppColors.error,
                         ),
                   ),
                 ],

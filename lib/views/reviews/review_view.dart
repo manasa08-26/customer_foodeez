@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/network/api_exception.dart';
 import '../../data/repositories/reviews_repository.dart';
@@ -118,6 +119,9 @@ class _RatingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final starColor = isDark ? AppColors.gold : Colors.amber;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingXs),
       child: Row(
@@ -136,7 +140,7 @@ class _RatingRow extends StatelessWidget {
                   onPressed: () => onChanged(star),
                   icon: Icon(
                     star <= value ? Icons.star_rounded : Icons.star_outline_rounded,
-                    color: Colors.amber,
+                    color: starColor,
                   ),
                 );
               }),

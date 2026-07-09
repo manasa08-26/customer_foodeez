@@ -177,30 +177,6 @@ class _PaymentsViewState extends ConsumerState<PaymentsView> {
               ),
             ],
             const SizedBox(height: AppDimensions.spacingXl),
-            Text(
-              'SAVED PAYMENT METHODS',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.5),
-                  ),
-            ),
-            const SizedBox(height: AppDimensions.spacingMd),
-            const _SavedPaymentTile(
-              icon: '🏦',
-              label: 'UPI',
-              subtitle: 'yourid@upi',
-              tag: 'Primary',
-            ),
-            const SizedBox(height: AppDimensions.spacingSm),
-            const _SavedPaymentTile(
-              icon: '💳',
-              label: 'Card',
-              subtitle: '**** **** **** 4242',
-            ),
           ],
         ),
       ),
@@ -239,7 +215,7 @@ class _BalanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimensions.spacingXl),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimensions.radius2xl),
-        gradient: AppColors.primaryGradient,
+        gradient: context.adaptive.primaryGradient,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,6 +289,9 @@ class _BalanceActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final filledText = isDark ? AppColors.gold : AppColors.primary;
+
     return Material(
       color: filled
           ? Colors.white
@@ -332,7 +311,7 @@ class _BalanceActionButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 14,
-                color: filled ? AppColors.primary : Colors.white,
+                color: filled ? filledText : Colors.white,
               ),
               const SizedBox(width: 4),
               Text(
@@ -340,7 +319,7 @@ class _BalanceActionButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: filled ? AppColors.primary : Colors.white,
+                  color: filled ? filledText : Colors.white,
                 ),
               ),
             ],
@@ -482,11 +461,11 @@ class _TopupPanel extends StatelessWidget {
             // or fixedSize: const Size(double.infinity, 48),
             padding: const EdgeInsets.symmetric(vertical: 12),
             backgroundColor: isSelected
-                ? AppColors.primarySurface
+                ? Theme.of(context).colorScheme.primaryContainer
                 : null,
             side: BorderSide(
               color: isSelected
-                  ? AppColors.primary
+                  ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).dividerColor,
             ),
             shape: RoundedRectangleBorder(
@@ -552,7 +531,9 @@ class _TopupPanel extends StatelessWidget {
               topupMsg!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: topupMsg!.startsWith('✓')
-                        ? Colors.green.shade700
+                        ? (Theme.of(context).brightness == Brightness.dark
+                            ? AppColors.gold
+                            : Colors.green.shade700)
                         : Theme.of(context).colorScheme.error,
                     fontWeight: FontWeight.w600,
                   ),
@@ -562,8 +543,6 @@ class _TopupPanel extends StatelessWidget {
           FilledButton(
             onPressed: initiating ? null : onSubmit,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
             child: Text(
@@ -593,15 +572,13 @@ class _GatewayChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return OutlinedButton(
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
-        backgroundColor:
-            selected ? AppColors.primarySurface : null,
+        backgroundColor: selected ? scheme.primaryContainer : null,
         side: BorderSide(
-          color: selected
-              ? AppColors.primary
-              : Theme.of(context).dividerColor,
+          color: selected ? scheme.primary : Theme.of(context).dividerColor,
         ),
       ),
       child: Text(label, style: const TextStyle(fontSize: 12)),
@@ -702,20 +679,34 @@ class _TransactionRow extends StatelessWidget {
   final NumberFormat currency;
   final bool showDivider;
 
-  static const _cfg = {
-    'CREDIT': (icon: '↓', color: Color(0xFF4ADE80), sign: '+'),
-    'TOPUP': (icon: '↓', color: Color(0xFF4ADE80), sign: '+'),
-    'REFUND_CREDIT': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
-    'CASHBACK_CREDIT': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
-    'REFERRAL_CREDIT': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
-    'DEBIT': (icon: '↑', color: Color(0xFFF87171), sign: '−'),
-    'REFUND': (icon: '↩', color: Color(0xFF60A5FA), sign: '+'),
-  };
+  static ({String icon, Color color, String sign}) _cfgFor(
+    BuildContext context,
+    String type,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final credit = isDark ? AppColors.gold : const Color(0xFF4ADE80);
+    final debit = isDark ? AppColors.white : const Color(0xFFF87171);
+    final refund = isDark ? AppColors.gold : const Color(0xFF60A5FA);
+
+    return switch (type) {
+      'CREDIT' => (icon: '↓', color: credit, sign: '+'),
+      'TOPUP' => (icon: '↓', color: credit, sign: '+'),
+      'REFUND_CREDIT' => (icon: '↩', color: refund, sign: '+'),
+      'CASHBACK_CREDIT' => (icon: '↩', color: refund, sign: '+'),
+      'REFERRAL_CREDIT' => (icon: '↩', color: refund, sign: '+'),
+      'DEBIT' => (icon: '↑', color: debit, sign: '−'),
+      'REFUND' => (icon: '↩', color: refund, sign: '+'),
+      _ => (
+          icon: '·',
+          color: Theme.of(context).colorScheme.onSurface,
+          sign: '',
+        ),
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cfg = _cfg[tx.type] ??
-        (icon: '·', color: Theme.of(context).colorScheme.onSurface, sign: '');
+    final cfg = _cfgFor(context, tx.type);
     final time = tx.createdAt != null
         ? DateFormat('hh:mm a').format(tx.createdAt!.toLocal())
         : '';
@@ -841,7 +832,7 @@ class _SavedPaymentTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
               ),
               child: Text(

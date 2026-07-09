@@ -78,6 +78,15 @@ class OrderRepository {
       authenticated: true,
     );
   }
+
+  Future<Map<String, dynamic>> getTracking(String orderId) async {
+    final res = await _api.get(
+      ApiEndpoints.orderTracking(orderId),
+      authenticated: true,
+    );
+    if (res is Map<String, dynamic>) return res;
+    return Map<String, dynamic>.from(res as Map);
+  }
 }
 
 final orderRepositoryProvider = Provider<OrderRepository>((ref) {

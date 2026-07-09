@@ -115,25 +115,18 @@ class _SignupViewState extends ConsumerState<SignupView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final topInset = MediaQuery.paddingOf(context).top;
     final sheetTop = topInset + 148;
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.primary,
       body: Stack(
         children: [
           Positioned.fill(
             child: DecoratedBox(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.primaryLight,
-                    AppColors.primary,
-                    AppColors.primaryDark,
-                  ],
-                ),
+              decoration: BoxDecoration(
+                gradient: AppColors.headerGradient(isDark),
               ),
               child: SafeArea(
                 bottom: false,
@@ -246,7 +239,7 @@ class _SignupViewState extends ConsumerState<SignupView> {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: isDark ? AppColors.gold : AppColors.primary,
                           letterSpacing: 2.2,
                         ),
                       ),
@@ -393,7 +386,7 @@ class _SignupViewState extends ConsumerState<SignupView> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
+                                color: isDark ? AppColors.gold : AppColors.primary,
                               ),
                             ),
                           ),
@@ -468,7 +461,10 @@ class _SignupField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 1.5,
+          ),
         ),
       ),
     );
@@ -488,13 +484,18 @@ class _PrimaryAuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradient =
+        isDark ? AppColors.darkGoldGradient : AppColors.primaryGradient;
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
+        gradient: gradient,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.28),
+            color: (isDark ? AppColors.gold : AppColors.primary)
+                .withValues(alpha: 0.28),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -522,7 +523,9 @@ class _PrimaryAuthButton extends StatelessWidget {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: isDark
+                            ? AppColors.darkBackground
+                            : Colors.white,
                       ),
                     ),
             ),

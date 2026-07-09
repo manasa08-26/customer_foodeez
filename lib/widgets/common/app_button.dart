@@ -23,6 +23,9 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accent = isDark ? AppColors.gold : AppColors.primary;
+
     final child = isLoading
         ? SizedBox(
             height: AppDimensions.iconMd,
@@ -31,7 +34,7 @@ class AppButton extends StatelessWidget {
               strokeWidth: 2,
               color: variant == AppButtonVariant.primary
                   ? AppColors.white
-                  : AppColors.primary,
+                  : accent,
             ),
           )
         : Row(
@@ -59,7 +62,7 @@ class AppButton extends StatelessWidget {
           onPressed: isLoading ? null : onPressed,
           child: Text(
             label,
-            style: AppTextStyles.labelLarge(AppColors.primary),
+            style: AppTextStyles.labelLarge(accent),
           ),
         ),
     };

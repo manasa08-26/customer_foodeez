@@ -35,11 +35,8 @@ class DiscoveryLoadingSkeleton extends StatelessWidget {
             mainAxisExtent: RestaurantCard.discoveryGridExtent,
           ),
           itemCount: columns * 2,
-          itemBuilder: (_, __) => Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-            ),
+          itemBuilder: (_, __) => ColoredBox(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
         ),
       ),

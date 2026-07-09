@@ -1,0 +1,5 @@
+/Users/santhoshreddy/foodeez_customer/store_assets/foodeez_play_store_icon_512_customer_light.png|512x512|86172
+/Users/santhoshreddy/foodeez_customer/store_assets/foodeez_play_store_feature_1024x500_brand_redesign.png|1024x500|110608
+SRC icon: (1254, 1254)
+SRC wide: (1024, 469)
+SRC profile: (1024, 1024)

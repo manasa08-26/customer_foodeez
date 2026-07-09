@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/discovery_controller.dart';
 import '../../controllers/location_controller.dart';
-import '../../core/constants/app_assets.dart';
+import '../../widgets/common/customer_logo.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../router/route_paths.dart';
@@ -82,7 +82,6 @@ class _SplashViewState extends ConsumerState<SplashView>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final size = MediaQuery.sizeOf(context);
     final logoBox = math.min(size.shortestSide * 0.34, 132.0);
 
@@ -91,21 +90,15 @@ class _SplashViewState extends ConsumerState<SplashView>
       child: Scaffold(
         body: SizedBox.expand(
           child: DecoratedBox(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        const Color(0xFF4A2F8C),
-                        AppColors.primaryDark,
-                        const Color(0xFF120A22),
-                      ]
-                    : [
-                        AppColors.primaryLight,
-                        AppColors.primary,
-                        AppColors.primaryDark,
-                      ],
+                colors: [
+                  AppColors.primaryLight,
+                  AppColors.primary,
+                  AppColors.primaryDark,
+                ],
               ),
             ),
             child: Stack(
@@ -144,26 +137,9 @@ class _SplashViewState extends ConsumerState<SplashView>
                         opacity: _logoFade,
                         child: ScaleTransition(
                           scale: _logoScale,
-                          child: Container(
+                          child: CustomerLogo.custom(
                             width: logoBox,
                             height: logoBox,
-                            padding: EdgeInsets.all(logoBox * 0.14),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(logoBox * 0.2),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 32,
-                                  offset: const Offset(0, 12),
-                                ),
-                              ],
-                            ),
-                            child: Image.asset(
-                              AppAssets.customerLight,
-                              fit: BoxFit.contain,
-                              alignment: Alignment.center,
-                            ),
                           ),
                         ),
                       ),

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/discovery_content.dart';
 import '../../data/models/restaurant_model.dart';
@@ -605,8 +606,11 @@ class _HorizontalRestaurantTile extends StatelessWidget {
                         bottom: 8,
                         child: Text(
                           '★ ${restaurant.rating!.toStringAsFixed(1)}',
-                          style: const TextStyle(
-                            color: Color(0xFF4ADE80),
+                          style: TextStyle(
+                            color: Theme.of(context).brightness ==
+                                    Brightness.dark
+                                ? AppColors.gold
+                                : const Color(0xFF4ADE80),
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                           ),

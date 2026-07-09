@@ -4,6 +4,7 @@ import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_service.dart';
 import '../../core/utils/json_parsers.dart';
 import '../models/profile_model.dart';
+import '../models/restaurant_model.dart';
 
 class ProfileRepository {
   ProfileRepository(this._api);
@@ -80,6 +81,34 @@ class ProfileRepository {
 
   Future<void> setDefaultAddress(String id) async {
     await _api.patch(ApiEndpoints.addressDefault(id), authenticated: true);
+  }
+
+  Future<List<RestaurantModel>> getFavoriteRestaurants() async {
+    final res = await _api.get(ApiEndpoints.favRestaurants, authenticated: true);
+    final list = _extractList(res);
+    return list
+        .whereType<Map>()
+        .map((e) => RestaurantModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
+
+  Future<void> addFavoriteRestaurant(String id) async {
+    await _api.post(ApiEndpoints.favRestaurant(id), authenticated: true);
+  }
+
+  Future<void> removeFavoriteRestaurant(String id) async {
+    await _api.delete(ApiEndpoints.favRestaurant(id), authenticated: true);
+  }
+
+  Future<List<dynamic>> getFavoriteItems() async {
+    final res = await _api.get(ApiEndpoints.favItems, authenticated: true);
+    return _extractList(res);
+  }
+
+  Future<Map<String, dynamic>> getSupportTicket(String id) async {
+    final res = await _api.get(ApiEndpoints.supportTicket(id), authenticated: true);
+    if (res is Map<String, dynamic>) return res;
+    return Map<String, dynamic>.from(res as Map);
   }
 
   List<dynamic> _extractList(dynamic res) {

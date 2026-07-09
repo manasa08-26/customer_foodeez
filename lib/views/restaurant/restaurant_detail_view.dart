@@ -10,6 +10,7 @@ import '../../router/route_paths.dart';
 import '../../widgets/common/empty_state_view.dart';
 import '../../widgets/common/error_state_view.dart';
 import '../../widgets/common/loading_view.dart';
+import '../../data/models/cart_model.dart';
 import '../../widgets/common/menu_item_card.dart';
 
 /// Full-screen restaurant menu — no shell header, name in AppBar + back.
@@ -29,7 +30,7 @@ class RestaurantDetailView extends ConsumerStatefulWidget {
 }
 
 class _RestaurantDetailViewState extends ConsumerState<RestaurantDetailView> {
-  String? _addingItemId;
+  String? _updatingItemId;
 
   void _goBack() {
     if (context.canPop()) {
@@ -40,7 +41,7 @@ class _RestaurantDetailViewState extends ConsumerState<RestaurantDetailView> {
   }
 
   Future<void> _addToCart(String menuItemId) async {
-    setState(() => _addingItemId = menuItemId);
+    setState(() => _updatingItemId = menuItemId);
     final returnPath = RoutePaths.restaurantDetail(widget.branchId);
     final success = await ref.read(cartControllerProvider.notifier).addItem(
           menuItemId: menuItemId,
@@ -48,26 +49,83 @@ class _RestaurantDetailViewState extends ConsumerState<RestaurantDetailView> {
           returnPath: returnPath,
         );
     if (!mounted) return;
-    setState(() => _addingItemId = null);
+    setState(() => _updatingItemId = null);
 
     if (!success) {
       context.push(RoutePaths.login);
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    _showAddedSnackBar();
+  }
+
+  Future<void> _incrementCartItem(String menuItemId) async {
+    final cartItem = _cartItemForMenu(menuItemId);
+    if (cartItem == null) {
+      await _addToCart(menuItemId);
+      return;
+    }
+
+    setState(() => _updatingItemId = menuItemId);
+    await ref.read(cartControllerProvider.notifier).updateQuantity(
+          cartItem.id,
+          cartItem.quantity + 1,
+        );
+    if (mounted) setState(() => _updatingItemId = null);
+  }
+
+  Future<void> _decrementCartItem(String menuItemId) async {
+    final cartItem = _cartItemForMenu(menuItemId);
+    if (cartItem == null) return;
+
+    setState(() => _updatingItemId = menuItemId);
+    final notifier = ref.read(cartControllerProvider.notifier);
+    if (cartItem.quantity <= 1) {
+      await notifier.removeItem(cartItem.id);
+    } else {
+      await notifier.updateQuantity(cartItem.id, cartItem.quantity - 1);
+    }
+    if (mounted) setState(() => _updatingItemId = null);
+  }
+
+  CartItemModel? _cartItemForMenu(String menuItemId) {
+    final items = ref.read(cartControllerProvider).value?.items ?? [];
+    for (final item in items) {
+      if (item.menuItemId == menuItemId) return item;
+    }
+    return null;
+  }
+
+  int _quantityForMenu(String menuItemId) {
+    return _cartItemForMenu(menuItemId)?.quantity ?? 0;
+  }
+
+  void _showAddedSnackBar() {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
       SnackBar(
-        content: const Text('Added to cart'),
-        action: SnackBarAction(
-          label: 'View Cart',
-          onPressed: () => context.go(RoutePaths.cart),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        content: const Text(
+          'Added to cart',
+          style: TextStyle(color: AppColors.white),
         ),
       ),
     );
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+      () => ref.read(cartControllerProvider.notifier).fetchCart(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.watch(cartControllerProvider);
     final state = ref.watch(restaurantControllerProvider(widget.branchId));
     final padding = AppDimensions.pagePadding(context);
     final title = state.restaurant?.name ??
@@ -133,10 +191,10 @@ class _RestaurantDetailViewState extends ConsumerState<RestaurantDetailView> {
               padding: const EdgeInsets.only(right: AppDimensions.spacingSm),
               child: Center(
                 child: Chip(
-                  avatar: const Icon(
+                  avatar: Icon(
                     Icons.star,
                     size: 16,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   label: Text(restaurant!.rating!.toStringAsFixed(1)),
                 ),
@@ -185,6 +243,7 @@ class _RestaurantDetailViewState extends ConsumerState<RestaurantDetailView> {
                     _FilterChip(
                       label: 'Veg',
                       selected: state.vegFilter == VegFilter.veg,
+                      indicatorColor: AppColors.veg,
                       onTap: () => ref
                           .read(
                             restaurantControllerProvider(widget.branchId)
@@ -195,6 +254,7 @@ class _RestaurantDetailViewState extends ConsumerState<RestaurantDetailView> {
                     _FilterChip(
                       label: 'Non-veg',
                       selected: state.vegFilter == VegFilter.nonVeg,
+                      indicatorColor: AppColors.nonVeg,
                       onTap: () => ref
                           .read(
                             restaurantControllerProvider(widget.branchId)
@@ -238,8 +298,11 @@ class _RestaurantDetailViewState extends ConsumerState<RestaurantDetailView> {
                               ),
                               child: MenuItemCard(
                                 item: item,
-                                isAdding: _addingItemId == item.id,
+                                quantity: _quantityForMenu(item.id),
+                                isUpdating: _updatingItemId == item.id,
                                 onAdd: () => _addToCart(item.id),
+                                onIncrement: () => _incrementCartItem(item.id),
+                                onDecrement: () => _decrementCartItem(item.id),
                               ),
                             ),
                           ),
@@ -260,19 +323,38 @@ class _FilterChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.indicatorColor,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final Color? indicatorColor;
 
   @override
   Widget build(BuildContext context) {
     return FilterChip(
-      label: Text(label),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (indicatorColor != null) ...[
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: indicatorColor,
+                shape: BoxShape.circle,
+                border: Border.all(color: indicatorColor!, width: 1.5),
+              ),
+            ),
+            const SizedBox(width: 6),
+          ],
+          Text(label),
+        ],
+      ),
       selected: selected,
       onSelected: (_) => onTap(),
-      selectedColor: AppColors.primarySurface,
+      selectedColor: Theme.of(context).colorScheme.primaryContainer,
     );
   }
 }
@@ -286,10 +368,11 @@ class _ViewCartBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final count = ref.watch(cartControllerProvider).value?.itemCount ?? 0;
     if (count == 0) return const SizedBox.shrink();
+    final barColor = Theme.of(context).colorScheme.primary;
+    final onBarColor = AppColors.white;
 
     return Material(
-      elevation: 8,
-      color: AppColors.primaryLight,
+      color: barColor,
       child: SafeArea(
         top: false,
         child: InkWell(
@@ -304,17 +387,17 @@ class _ViewCartBar extends ConsumerWidget {
                 Text(
                   '$count item${count == 1 ? '' : 's'}',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.white,
+                        color: onBarColor,
                       ),
                 ),
                 const Spacer(),
                 Text(
                   'View Cart',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.white,
+                        color: onBarColor,
                       ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.white),
+                Icon(Icons.chevron_right, color: onBarColor),
               ],
             ),
           ),

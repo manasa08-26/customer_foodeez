@@ -19,7 +19,7 @@ abstract final class CustomerLogoSizes {
 }
 
 /// Theme-aware customer logo: [AppAssets.customerLight] in light mode,
-/// [AppAssets.customerDark] in dark mode.
+/// [AppAssets.customerDark] in dark mode (transparent PNG).
 class CustomerLogo extends StatelessWidget {
   const CustomerLogo.appBar({super.key, this.asset, bool compact = false})
       : width = compact
@@ -27,68 +27,50 @@ class CustomerLogo extends StatelessWidget {
             : CustomerLogoSizes.appBarWidth,
         height = compact
             ? CustomerLogoSizes.appBarCompactHeight
-            : CustomerLogoSizes.appBarHeight,
-        _variant = _LogoVariant.appBar;
+            : CustomerLogoSizes.appBarHeight;
 
   const CustomerLogo.auth({super.key, bool compact = false, this.asset})
       : width = compact
             ? CustomerLogoSizes.authCompactWidth
             : CustomerLogoSizes.authWidth,
         height =
-            compact ? CustomerLogoSizes.authCompact : CustomerLogoSizes.auth,
-        _variant = _LogoVariant.auth;
+            compact ? CustomerLogoSizes.authCompact : CustomerLogoSizes.auth;
 
   const CustomerLogo.splashIcon({super.key, this.asset})
       : width = CustomerLogoSizes.splashIcon,
-        height = CustomerLogoSizes.splashIcon,
-        _variant = _LogoVariant.splashIcon;
+        height = CustomerLogoSizes.splashIcon;
 
   const CustomerLogo.splashWordmark({super.key, this.asset})
       : width = CustomerLogoSizes.splashWordmarkWidth,
-        height = CustomerLogoSizes.splashWordmarkHeight,
-        _variant = _LogoVariant.splashWordmark;
+        height = CustomerLogoSizes.splashWordmarkHeight;
 
   const CustomerLogo.custom({
     super.key,
     required this.width,
     required this.height,
     this.asset,
-  }) : _variant = _LogoVariant.custom;
+  });
 
   final double width;
   final double height;
   final String? asset;
-  final _LogoVariant _variant;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final logoAsset = asset ?? AppAssets.customerLogoFor(context);
-
-    Widget image = Image.asset(
-      logoAsset,
-      width: width,
-      height: height,
-      fit: BoxFit.contain,
-      alignment: Alignment.center,
-    );
-
-    // PNG logos include a white matte — blend it away on dark headers.
-    if (isDark && _variant == _LogoVariant.appBar) {
-      final headerBg = Theme.of(context).appBarTheme.backgroundColor ??
-          Theme.of(context).colorScheme.surface;
-      image = ColorFiltered(
-        colorFilter: ColorFilter.mode(headerBg, BlendMode.multiply),
-        child: image,
-      );
-    }
 
     return SizedBox(
       width: width,
       height: height,
-      child: image,
+      child: Image.asset(
+        logoAsset,
+        width: width,
+        height: height,
+        fit: BoxFit.contain,
+        alignment: Alignment.center,
+        filterQuality: FilterQuality.high,
+        gaplessPlayback: true,
+      ),
     );
   }
 }
-
-enum _LogoVariant { appBar, auth, splashIcon, splashWordmark, custom }

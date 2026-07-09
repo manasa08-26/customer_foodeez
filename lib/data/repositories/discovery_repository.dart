@@ -90,6 +90,59 @@ class DiscoveryRepository {
         .map((e) => MenuCategoryModel.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
+
+  Future<List<RestaurantModel>> getTrending({
+    required double lat,
+    required double lng,
+  }) async {
+    final res = await _api.get(
+      ApiEndpoints.discoveryTrending,
+      query: {
+        'lat': lat.toString(),
+        'lng': lng.toString(),
+      },
+    );
+    return _parseRestaurantList(res);
+  }
+
+  Future<List<dynamic>> getPopularDishes({
+    required double lat,
+    required double lng,
+  }) async {
+    final res = await _api.get(
+      ApiEndpoints.discoveryPopularDishes,
+      query: {
+        'lat': lat.toString(),
+        'lng': lng.toString(),
+      },
+    );
+    final map = res is Map<String, dynamic>
+        ? res
+        : Map<String, dynamic>.from(res as Map);
+    return map['dishes'] as List? ??
+        map['data']?['dishes'] as List? ??
+        (res is List ? res : <dynamic>[]);
+  }
+
+  List<RestaurantModel> _parseRestaurantList(dynamic res) {
+    if (res is List) {
+      return res
+          .whereType<Map>()
+          .map((e) => RestaurantModel.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    final map = res is Map<String, dynamic>
+        ? res
+        : Map<String, dynamic>.from(res as Map);
+    final list = map['restaurants'] as List? ??
+        map['data']?['restaurants'] as List? ??
+        map['items'] as List? ??
+        [];
+    return list
+        .whereType<Map>()
+        .map((e) => RestaurantModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
 }
 
 final discoveryRepositoryProvider = Provider<DiscoveryRepository>((ref) {
